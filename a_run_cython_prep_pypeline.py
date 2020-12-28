@@ -11,10 +11,10 @@ Created on Wed Dec 23 13:07:58 2020
 # =============================================================================
 # import libraries
 # =============================================================================
-# --- import spacy ---
-import spacy
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime as dt
+import pandas as pd
+
 # =============================================================================
 # Paths
 # =============================================================================
@@ -34,10 +34,12 @@ def read_corpus(filename):
 sentences = read_corpus(data_path/ "train.tsv")
 sentences = [i[0] for i in sentences][:100000]
 
-# sentences = ['the car is car' for i in range(0,5)]
-
-
 # --- Load spacy English ---
+import spacy
+import re
+from spacy.tokenizer import Tokenizer
+
+# --- Define spacy and remove unwanted steps
 nlp = spacy.load("en_core_web_sm",
                  disable=["tagger", # tagger takes 4x longer
                           "parser",
@@ -45,17 +47,22 @@ nlp = spacy.load("en_core_web_sm",
                           "textcat"]
                  )
 
+# --- we want to modify the tokenizer so that it also splits on "|"
+# note: we need to use escape characters
+infix_re = re.compile(r'''\|''')
+
+def custom_tokenizer(nlp):
+  return Tokenizer(nlp.vocab, infix_finditer=infix_re.finditer)
+
+nlp.tokenizer = custom_tokenizer(nlp)
 
 
-# --- Custom cython libraries ----
+
+# =============================================================================
+# generate spacy docs and run cython preprocessing steps
+# =============================================================================
+
 import spacy_tokenize as st
-
-
-# =============================================================================
-# preprocess
-# =============================================================================
-# --- make doclist ---
-from datetime import datetime as dt
 start_nlp = dt.now()
 sentences = [doc for doc  in nlp.pipe(sentences)]
 
@@ -68,18 +75,6 @@ end_pipeline = dt.now()
 print('nlp time:', end_nlp-start_nlp)
 print('pipeline time:', end_pipeline-start_pipeline)
 
-
-# =============================================================================
-# run the preprocessing
-# =============================================================================
-
-# import spacy
-# nlp = spacy.load('en_core_web_sm')
-# t = (u"India Australia Brazil")
-# li = nlp(t)
-# for i in li:
-#     print(i.text)
-
-
-# list_of_strings  = [i.text for i in li]
+res = pd.DataFrame(res,
+                   columns = ['word','frequency'])
 

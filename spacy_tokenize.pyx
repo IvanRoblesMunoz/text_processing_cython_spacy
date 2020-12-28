@@ -19,8 +19,6 @@ from cymem.cymem cimport Pool
 from libc.string cimport memcpy           # C string copy function
 from libc.stdint cimport uint32_t         # C unsigned 32-bit integer type
 
-from libcpp.string cimport string         # decode unicode string
-
 # Cython Hash table and fast counter
 from preshed.maps cimport PreshMap        # Hash table
 from preshed.counter cimport count_t      # Count type (equivalent to C int64_t)
@@ -28,35 +26,29 @@ from preshed.counter cimport PreshCounter # Fast counter
 
 # spaCy C functions and types
 from spacy.strings cimport hash_utf8      # Hash function (using MurmurHash2)
-from spacy.typedefs cimport hash_t        # Hash type (equivalent to C uint64_t) 
-                                          # fixed width integer
-                                          
+from spacy.typedefs cimport hash_t        # Hash type (equivalent to C uint64_t), fixed width integer 
 from spacy.strings cimport Utf8Str        # C char array/pointer
 from spacy.strings cimport decode_Utf8Str # C char array/pointer to Python string function
 
+from spacy.tokens.doc cimport Doc
+from spacy.typedefs cimport hash_t
+from spacy.structs cimport TokenC
 
 # --- 100x faster tutorial ---
 # https://medium.com/huggingface/100-times-faster-natural-language-processing-in-python-ee32033bdced
 import numpy as np # Sometime we have a fail to import numpy compilation error if we don't import numpy
 cimport numpy as np
-from cymem.cymem cimport Pool
-from spacy.tokens.doc cimport Doc
-from spacy.typedefs cimport hash_t
-from spacy.structs cimport TokenC
+
 from tqdm import tqdm
 from datetime import datetime as dt
 
 
-# --- Print function for cython
-from libc.stdio cimport printf
-
-cimport numpy as np
 # =============================================================================
 # Work
 # =============================================================================
 
-# define global variables
-cdef PreshMap hashmap_words = PreshMap(initial_size=1024) 
+# define global objects
+cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
 cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
 
 def run_pipeline(list sentences):
@@ -68,9 +60,10 @@ def run_pipeline(list sentences):
     # --- convert python to cython ----
     start_convert = dt.now()
     byte_sentences = []
-    
     for words in sentences:
-        byte_sentence = [bytes(word.text,'utf-8') for word in words]
+        # To do: find a way to speed up lowering as doing it this way is 
+        # ~ 10x slower
+        byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]
         byte_sentences.append(byte_sentence)   
     end_convert = dt.now()   
 
@@ -86,27 +79,11 @@ def run_pipeline(list sentences):
     
     print('convert time: ',end_convert - start_convert)
     print('insert time: ',end_insert - start_insert)
-    print('insert time: ',end_read_count - start_read_count)    
+    print('read countter time: ',end_read_count - start_read_count)    
     
     return results
     
     
-            
-cdef list preshcount_to_list(PreshCounter counter):
-    cdef:
-        list results
-        int i, freq
-        hash_t wordhash
-
-    results = []
-    for i in range(counter.c_map.length):
-        wordhash = counter.c_map.cells[i].key
-        if wordhash != 0:
-            freq = <count_t>counter.c_map.cells[i].value
-            # returning the acctual words takes ~ 2x longer than returning utf8 keys
-            results.append([get_unicode(wordhash, hashmap_words),freq])
-        
-    return results
         
     
 # --- Completedish ----       
@@ -163,15 +140,45 @@ cdef void iterate_through_words(list byte_sentences):
             key = insert_in_hashmap( word)
             overall_word_count.inc(key,1)  
             
+# =============================================================================
+# Completed functions
+# =============================================================================
+cdef list preshcount_to_list(PreshCounter counter):
+    '''
+    This function takes a counter and the global object hashmap_words and 
+    returns 
+    Parameters
+    ----------
+    PreshCounter counter : PreshCounter
+        DESCRIPTION.
+        
+    Returns
+    -------
+    results : list 
+        list of lists containing [unicode word, number of times in the text]
+    '''
+    cdef:
+        list results
+        int i, freq
+        hash_t wordhash
+
+    results = []
+    for i in range(counter.c_map.length):
+        wordhash = counter.c_map.cells[i].key
+        if wordhash != 0:
+            freq = <count_t>counter.c_map.cells[i].value
+            # returning the acctual words takes ~ 2x longer than returning utf8 keys
+            results.append([get_unicode(wordhash, hashmap_words),freq])
+        
+    return results            
 
 # =============================================================================
-# reference
+# extertnal functions
 # =============================================================================
 # Functions from fast BOW
 # https://medium.com/glose-team/%EF%B8%8F-fast-bag-of-words-using-spacy-and-cython-574c308a9ff3
 
-  
-
+# To do: figure out how memory allocation acctually works
 cdef Utf8Str* _allocate(Pool mem, const unsigned char* chars, uint32_t length) except *:
     cdef:
         int n_length_bytes
@@ -198,7 +205,7 @@ cdef Utf8Str* _allocate(Pool mem, const unsigned char* chars, uint32_t length) e
         memcpy(&string.p[n_length_bytes], chars, length)
     return string
  
- 
+
 cdef unicode get_unicode(hash_t wordhash,PreshMap hashmap):
     utf8str = <Utf8Str*>hashmap.get(wordhash)
     if utf8str is NULL:
