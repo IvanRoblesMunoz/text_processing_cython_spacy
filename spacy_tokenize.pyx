@@ -57,14 +57,15 @@ cimport numpy as np
 
 # define global variables
 cdef PreshMap hashmap_words = PreshMap(initial_size=1024) 
+cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
 
 def run_pipeline(list sentences):
-    
     cdef:
-        list byte_sentence, byte_sentences
+        list byte_sentence, byte_sentences, results
         # TokenC word
         Doc words
     
+    # --- convert python to cython ----
     start_convert = dt.now()
     byte_sentences = []
     
@@ -73,30 +74,42 @@ def run_pipeline(list sentences):
         byte_sentences.append(byte_sentence)   
     end_convert = dt.now()   
 
-    
+    # --- generate hashmap and counter ----
     start_insert = dt.now()
-    sentence_in_hashmap(byte_sentences)
-        
+    iterate_through_words(byte_sentences) 
     end_insert = dt.now()
+    
+    # --- read counter ---
+    start_read_count = dt.now()
+    results = preshcount_to_list(overall_word_count)
+    end_read_count = dt.now()
     
     print('convert time: ',end_convert - start_convert)
     print('insert time: ',end_insert - start_insert)
+    print('insert time: ',end_read_count - start_read_count)    
+    
+    return results
     
     
-    
-cdef sentence_in_hashmap(list byte_sentences):
-    
+            
+cdef list preshcount_to_list(PreshCounter counter):
     cdef:
-        list byte_sentence
-        bytes word
-        hash_t key
-        
-    for byte_sentence in byte_sentences:
-        for word in byte_sentence:
-            key = insert_in_hashmap( word)
-            
-            
+        list results
+        int i, freq
+        hash_t wordhash
 
+    results = []
+    for i in range(counter.c_map.length):
+        wordhash = counter.c_map.cells[i].key
+        if wordhash != 0:
+            freq = <count_t>counter.c_map.cells[i].value
+            # returning the acctual words takes ~ 2x longer than returning utf8 keys
+            results.append([get_unicode(wordhash, hashmap_words),freq])
+        
+    return results
+        
+    
+# --- Completedish ----       
 cdef hash_t insert_in_hashmap(bytes word):
     '''
     This function takes a string of bytes, hashes it into fixed width
@@ -136,7 +149,19 @@ cdef hash_t insert_in_hashmap(bytes word):
         # print('unicode:2',get_unicode(key, hashmap_words))
         return key
              
-       
+     
+cdef void iterate_through_words(list byte_sentences):
+    ''' This function iterates through the words and generates the counters
+    '''
+    cdef:
+        list byte_sentence
+        bytes word
+        hash_t key
+        
+    for byte_sentence in byte_sentences:
+        for word in byte_sentence:
+            key = insert_in_hashmap( word)
+            overall_word_count.inc(key,1)  
             
 
 # =============================================================================
