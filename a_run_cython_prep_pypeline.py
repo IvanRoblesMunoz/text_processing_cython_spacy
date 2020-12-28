@@ -47,15 +47,18 @@ nlp = spacy.load("en_core_web_sm",
                           "textcat"]
                  )
 
-# --- we want to modify the tokenizer so that it also splits on "|"
+# --- we want to modify the tokenizer so that it also splits on "|" or "\"" 
 # note: we need to use escape characters
-infix_re = re.compile(r'''\|''')
+infix_re = re.compile(r'''\||\"''')
 
 def custom_tokenizer(nlp):
-  return Tokenizer(nlp.vocab, infix_finditer=infix_re.finditer)
-
+    return Tokenizer(nlp.vocab, infix_finditer=infix_re.finditer)
 nlp.tokenizer = custom_tokenizer(nlp)
 
+# Test that our regex infix works
+ts = nlp("This is |a|te\"st\'let")
+for i in ts:
+    print(i)
 
 
 # =============================================================================
@@ -72,9 +75,9 @@ start_pipeline = dt.now()
 res = st.run_pipeline(sentences)
 end_pipeline = dt.now()
 
-print('nlp time:', end_nlp-start_nlp)
 print('pipeline time:', end_pipeline-start_pipeline)
 
-res = pd.DataFrame(res,
-                   columns = ['word','frequency'])
+
+# res = pd.DataFrame(res,
+#                    columns = ['word','frequency'])
 

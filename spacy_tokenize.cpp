@@ -3566,6 +3566,8 @@ static struct __pyx_t_5spacy_7structs_LexemeC *__pyx_vp_5spacy_5vocab_EMPTY_LEXE
 /* Module declarations from 'spacy.tokens.doc' */
 static PyTypeObject *__pyx_ptype_5spacy_6tokens_3doc_Doc = 0;
 
+/* Module declarations from 'libcpp' */
+
 /* Module declarations from 'spacy_tokenize' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
@@ -3654,14 +3656,13 @@ static const char __pyx_k_size[] = "size";
 static const char __pyx_k_step[] = "step";
 static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
-static const char __pyx_k_text[] = "text";
 static const char __pyx_k_tqdm[] = "tqdm";
 static const char __pyx_k_word[] = "word";
 static const char __pyx_k_ASCII[] = "ASCII";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_flags[] = "flags";
-static const char __pyx_k_lower[] = "lower";
+static const char __pyx_k_lower[] = "lower_";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_print[] = "print";
 static const char __pyx_k_range[] = "range";
@@ -3724,6 +3725,7 @@ static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_start_read_count[] = "start_read_count";
 static const char __pyx_k_not_in_hash_table[] = " not in hash table";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
+static const char __pyx_k_read_counter_time[] = "read counter time: ";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_spacy_tokenize_pyx[] = "spacy_tokenize.pyx";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
@@ -3841,6 +3843,7 @@ static PyObject *__pyx_n_s_pyx_type;
 static PyObject *__pyx_n_s_pyx_unpickle_Enum;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_range;
+static PyObject *__pyx_kp_s_read_counter_time;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
@@ -3865,7 +3868,6 @@ static PyObject *__pyx_kp_s_strided_and_indirect;
 static PyObject *__pyx_kp_s_stringsource;
 static PyObject *__pyx_n_s_struct;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_n_s_text;
 static PyObject *__pyx_n_s_tqdm;
 static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
@@ -3958,10 +3960,10 @@ static PyObject *__pyx_codeobj__22;
 static PyObject *__pyx_codeobj__29;
 /* Late includes */
 
-/* "spacy_tokenize.pyx":54
+/* "spacy_tokenize.pyx":55
  * cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
  * 
- * def run_pipeline(list sentences):             # <<<<<<<<<<<<<<
+ * def run_pipeline(list sentences ):             # <<<<<<<<<<<<<<
  *     cdef:
  *         list byte_sentence, byte_sentences, results
  */
@@ -3976,7 +3978,7 @@ static PyObject *__pyx_pw_14spacy_tokenize_1run_pipeline(PyObject *__pyx_self, P
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("run_pipeline (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_sentences), (&PyList_Type), 1, "sentences", 1))) __PYX_ERR(0, 54, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_sentences), (&PyList_Type), 1, "sentences", 1))) __PYX_ERR(0, 55, __pyx_L1_error)
   __pyx_r = __pyx_pf_14spacy_tokenize_run_pipeline(__pyx_self, ((PyObject*)__pyx_v_sentences));
 
   /* function exit code */
@@ -4010,23 +4012,22 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   PyObject *(*__pyx_t_6)(PyObject *);
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
-  PyObject *__pyx_t_9 = NULL;
-  int __pyx_t_10;
+  int __pyx_t_9;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("run_pipeline", 0);
 
-  /* "spacy_tokenize.pyx":61
+  /* "spacy_tokenize.pyx":62
  * 
  *     # --- convert python to cython ----
  *     start_convert = dt.now()             # <<<<<<<<<<<<<<
  *     byte_sentences = []
  *     for words in sentences:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_dt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_dt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_now); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_now); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -4041,52 +4042,52 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_start_convert = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "spacy_tokenize.pyx":62
+  /* "spacy_tokenize.pyx":63
  *     # --- convert python to cython ----
  *     start_convert = dt.now()
  *     byte_sentences = []             # <<<<<<<<<<<<<<
  *     for words in sentences:
- *         # To do: find a way to speed up lowering
+ *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_byte_sentences = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "spacy_tokenize.pyx":63
+  /* "spacy_tokenize.pyx":64
  *     start_convert = dt.now()
  *     byte_sentences = []
  *     for words in sentences:             # <<<<<<<<<<<<<<
- *         # To do: find a way to speed up lowering
- *         byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+ *         byte_sentences.append(byte_sentence)
  */
   if (unlikely(__pyx_v_sentences == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 63, __pyx_L1_error)
+    __PYX_ERR(0, 64, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_sentences; __Pyx_INCREF(__pyx_t_1); __pyx_t_4 = 0;
   for (;;) {
     if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 63, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 64, __pyx_L1_error)
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
-    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5spacy_6tokens_3doc_Doc))))) __PYX_ERR(0, 63, __pyx_L1_error)
+    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5spacy_6tokens_3doc_Doc))))) __PYX_ERR(0, 64, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_words, ((struct __pyx_obj_5spacy_6tokens_3doc_Doc *)__pyx_t_3));
     __pyx_t_3 = 0;
 
     /* "spacy_tokenize.pyx":65
+ *     byte_sentences = []
  *     for words in sentences:
- *         # To do: find a way to speed up lowering
- *         byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]             # <<<<<<<<<<<<<<
+ *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]             # <<<<<<<<<<<<<<
  *         byte_sentences.append(byte_sentence)
  *     end_convert = dt.now()
  */
@@ -4133,37 +4134,19 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
       }
       __Pyx_XDECREF_SET(__pyx_v_word, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_word, __pyx_n_s_text); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 65, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_lower); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 65, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = NULL;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
-        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
-        if (likely(__pyx_t_8)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-          __Pyx_INCREF(__pyx_t_8);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_9, function);
-        }
-      }
-      __pyx_t_7 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 65, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_word, __pyx_n_s_lower); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 65, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 65, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
+      __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 65, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7);
+      PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7);
       __Pyx_INCREF(__pyx_kp_s_utf_8);
       __Pyx_GIVEREF(__pyx_kp_s_utf_8);
-      PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_kp_s_utf_8);
+      PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_kp_s_utf_8);
       __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_PyObject_Call(((PyObject *)(&PyBytes_Type)), __pyx_t_9, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 65, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_Call(((PyObject *)(&PyBytes_Type)), __pyx_t_8, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 65, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       if (unlikely(__Pyx_ListComp_Append(__pyx_t_3, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 65, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
@@ -4172,26 +4155,26 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
     __pyx_t_3 = 0;
 
     /* "spacy_tokenize.pyx":66
- *         # To do: find a way to speed up lowering
- *         byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]
+ *     for words in sentences:
+ *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
  *         byte_sentences.append(byte_sentence)             # <<<<<<<<<<<<<<
  *     end_convert = dt.now()
  * 
  */
-    __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_byte_sentences, __pyx_v_byte_sentence); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 66, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_byte_sentences, __pyx_v_byte_sentence); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 66, __pyx_L1_error)
 
-    /* "spacy_tokenize.pyx":63
+    /* "spacy_tokenize.pyx":64
  *     start_convert = dt.now()
  *     byte_sentences = []
  *     for words in sentences:             # <<<<<<<<<<<<<<
- *         # To do: find a way to speed up lowering
- *         byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+ *         byte_sentences.append(byte_sentence)
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "spacy_tokenize.pyx":67
- *         byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
  *         byte_sentences.append(byte_sentence)
  *     end_convert = dt.now()             # <<<<<<<<<<<<<<
  * 
@@ -4369,7 +4352,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
  * 
  *     print('convert time: ',end_convert - start_convert)             # <<<<<<<<<<<<<<
  *     print('insert time: ',end_insert - start_insert)
- *     print('insert time: ',end_read_count - start_read_count)
+ *     print('read counter time: ',end_read_count - start_read_count)
  */
   __pyx_t_3 = PyNumber_Subtract(__pyx_v_end_convert, __pyx_v_start_convert); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -4388,7 +4371,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
  * 
  *     print('convert time: ',end_convert - start_convert)
  *     print('insert time: ',end_insert - start_insert)             # <<<<<<<<<<<<<<
- *     print('insert time: ',end_read_count - start_read_count)
+ *     print('read counter time: ',end_read_count - start_read_count)
  * 
  */
   __pyx_t_2 = PyNumber_Subtract(__pyx_v_end_insert, __pyx_v_start_insert); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
@@ -4407,7 +4390,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   /* "spacy_tokenize.pyx":81
  *     print('convert time: ',end_convert - start_convert)
  *     print('insert time: ',end_insert - start_insert)
- *     print('insert time: ',end_read_count - start_read_count)             # <<<<<<<<<<<<<<
+ *     print('read counter time: ',end_read_count - start_read_count)             # <<<<<<<<<<<<<<
  * 
  *     return results
  */
@@ -4415,9 +4398,9 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 81, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_kp_s_insert_time);
-  __Pyx_GIVEREF(__pyx_kp_s_insert_time);
-  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_s_insert_time);
+  __Pyx_INCREF(__pyx_kp_s_read_counter_time);
+  __Pyx_GIVEREF(__pyx_kp_s_read_counter_time);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_s_read_counter_time);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_3);
   __pyx_t_3 = 0;
@@ -4425,7 +4408,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "spacy_tokenize.pyx":83
- *     print('insert time: ',end_read_count - start_read_count)
+ *     print('read counter time: ',end_read_count - start_read_count)
  * 
  *     return results             # <<<<<<<<<<<<<<
  * 
@@ -4436,10 +4419,10 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   __pyx_r = __pyx_v_results;
   goto __pyx_L0;
 
-  /* "spacy_tokenize.pyx":54
+  /* "spacy_tokenize.pyx":55
  * cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
  * 
- * def run_pipeline(list sentences):             # <<<<<<<<<<<<<<
+ * def run_pipeline(list sentences ):             # <<<<<<<<<<<<<<
  *     cdef:
  *         list byte_sentence, byte_sentences, results
  */
@@ -4451,7 +4434,6 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("spacy_tokenize.run_pipeline", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -19973,6 +19955,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_unpickle_Enum, __pyx_k_pyx_unpickle_Enum, sizeof(__pyx_k_pyx_unpickle_Enum), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
+  {&__pyx_kp_s_read_counter_time, __pyx_k_read_counter_time, sizeof(__pyx_k_read_counter_time), 0, 0, 1, 0},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
@@ -19997,7 +19980,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_stringsource, __pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 0, 1, 0},
   {&__pyx_n_s_struct, __pyx_k_struct, sizeof(__pyx_k_struct), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {&__pyx_n_s_text, __pyx_k_text, sizeof(__pyx_k_text), 0, 0, 1, 1},
   {&__pyx_n_s_tqdm, __pyx_k_tqdm, sizeof(__pyx_k_tqdm), 0, 0, 1, 1},
   {&__pyx_kp_s_unable_to_allocate_array_data, __pyx_k_unable_to_allocate_array_data, sizeof(__pyx_k_unable_to_allocate_array_data), 0, 0, 1, 0},
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
@@ -20242,17 +20224,17 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
-  /* "spacy_tokenize.pyx":54
+  /* "spacy_tokenize.pyx":55
  * cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
  * 
- * def run_pipeline(list sentences):             # <<<<<<<<<<<<<<
+ * def run_pipeline(list sentences ):             # <<<<<<<<<<<<<<
  *     cdef:
  *         list byte_sentence, byte_sentences, results
  */
-  __pyx_tuple__21 = PyTuple_Pack(12, __pyx_n_s_sentences, __pyx_n_s_byte_sentence, __pyx_n_s_byte_sentences, __pyx_n_s_results, __pyx_n_s_words, __pyx_n_s_start_convert, __pyx_n_s_end_convert, __pyx_n_s_start_insert, __pyx_n_s_end_insert, __pyx_n_s_start_read_count, __pyx_n_s_end_read_count, __pyx_n_s_word); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(12, __pyx_n_s_sentences, __pyx_n_s_byte_sentence, __pyx_n_s_byte_sentences, __pyx_n_s_results, __pyx_n_s_words, __pyx_n_s_start_convert, __pyx_n_s_end_convert, __pyx_n_s_start_insert, __pyx_n_s_end_insert, __pyx_n_s_start_read_count, __pyx_n_s_end_read_count, __pyx_n_s_word); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_spacy_tokenize_pyx, __pyx_n_s_run_pipeline, 54, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_spacy_tokenize_pyx, __pyx_n_s_run_pipeline, 55, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 55, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -20829,7 +20811,7 @@ if (!__Pyx_RefNanny) {
  * from tqdm import tqdm
  * from datetime import datetime as dt             # <<<<<<<<<<<<<<
  * 
- * 
+ * from libcpp cimport bool
  */
   __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -20845,17 +20827,17 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "spacy_tokenize.pyx":51
+  /* "spacy_tokenize.pyx":52
  * 
  * # define global objects
  * cdef PreshMap hashmap_words = PreshMap(initial_size=1024)             # <<<<<<<<<<<<<<
  * cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
  * 
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_initial_size, __pyx_int_1024) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_7preshed_4maps_PreshMap), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_initial_size, __pyx_int_1024) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_7preshed_4maps_PreshMap), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_XGOTREF(((PyObject *)__pyx_v_14spacy_tokenize_hashmap_words));
@@ -20863,17 +20845,17 @@ if (!__Pyx_RefNanny) {
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "spacy_tokenize.pyx":52
+  /* "spacy_tokenize.pyx":53
  * # define global objects
  * cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
  * cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)             # <<<<<<<<<<<<<<
  * 
- * def run_pipeline(list sentences):
+ * def run_pipeline(list sentences ):
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_initial_size, __pyx_int_256) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_7preshed_7counter_PreshCounter), __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_initial_size, __pyx_int_256) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_7preshed_7counter_PreshCounter), __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_XGOTREF(((PyObject *)__pyx_v_14spacy_tokenize_overall_word_count));
@@ -20881,16 +20863,16 @@ if (!__Pyx_RefNanny) {
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "spacy_tokenize.pyx":54
+  /* "spacy_tokenize.pyx":55
  * cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
  * 
- * def run_pipeline(list sentences):             # <<<<<<<<<<<<<<
+ * def run_pipeline(list sentences ):             # <<<<<<<<<<<<<<
  *     cdef:
  *         list byte_sentence, byte_sentences, results
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_14spacy_tokenize_1run_pipeline, NULL, __pyx_n_s_spacy_tokenize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_14spacy_tokenize_1run_pipeline, NULL, __pyx_n_s_spacy_tokenize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_run_pipeline, __pyx_t_1) < 0) __PYX_ERR(0, 54, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_run_pipeline, __pyx_t_1) < 0) __PYX_ERR(0, 55, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "spacy_tokenize.pyx":1

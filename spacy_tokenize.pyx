@@ -42,6 +42,7 @@ cimport numpy as np
 from tqdm import tqdm
 from datetime import datetime as dt
 
+from libcpp cimport bool
 
 # =============================================================================
 # Work
@@ -51,7 +52,7 @@ from datetime import datetime as dt
 cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
 cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
 
-def run_pipeline(list sentences):
+def run_pipeline(list sentences ):
     cdef:
         list byte_sentence, byte_sentences, results
         # TokenC word
@@ -61,10 +62,8 @@ def run_pipeline(list sentences):
     start_convert = dt.now()
     byte_sentences = []
     for words in sentences:
-        # To do: find a way to speed up lowering as doing it this way is 
-        # ~ 10x slower
-        byte_sentence = [bytes(word.text.lower(),'utf-8') for word in words]
-        byte_sentences.append(byte_sentence)   
+        byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+        byte_sentences.append(byte_sentence)
     end_convert = dt.now()   
 
     # --- generate hashmap and counter ----
@@ -79,7 +78,7 @@ def run_pipeline(list sentences):
     
     print('convert time: ',end_convert - start_convert)
     print('insert time: ',end_insert - start_insert)
-    print('read countter time: ',end_read_count - start_read_count)    
+    print('read counter time: ',end_read_count - start_read_count)    
     
     return results
     
