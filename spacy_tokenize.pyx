@@ -86,10 +86,11 @@ def run_pipeline(list sentences ):
         
     
 # --- Completedish ----       
-cdef hash_t insert_in_hashmap(bytes word):
+cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
     '''
     This function takes a string of bytes, hashes it into fixed width
-    integer and then inserts it into the global hashmap
+    integer and then inserts it into the hashmap while alocating memory 
+    for it
 
     Parameters
     ----------
@@ -101,28 +102,27 @@ cdef hash_t insert_in_hashmap(bytes word):
     key : hash_t
         hased word into fixed intiger code
     '''
-    
     cdef:
         int length 
         hash_t key
         Utf8Str* value 
         #  Pool deals with memory management 
-        Pool mem = hashmap_words.mem
+        Pool mem = hashmap.mem
 
     length = len(word)
     # our hash table assumes prehashed key, so we hash it so to get a utf8 code 
     key = hash_utf8(word, length)
     # here we are defining the pointer for our string 
-    value = <Utf8Str*>hashmap_words.get(key)
+    value = <Utf8Str*>hashmap.get(key)
 
     if value is not NULL:
-        # print('unicode:1',get_unicode(key, hashmap_words))
+        # print('unicode:1',get_unicode(key, hashmap))
         return key
             
     else:
         value = _allocate(mem, word, length)
-        hashmap_words.set(key, value)
-        # print('unicode:2',get_unicode(key, hashmap_words))
+        hashmap.set(key, value)
+        # print('unicode:2',get_unicode(key, hashmap))
         return key
              
      
@@ -136,7 +136,7 @@ cdef void iterate_through_words(list byte_sentences):
         
     for byte_sentence in byte_sentences:
         for word in byte_sentence:
-            key = insert_in_hashmap( word)
+            key = insert_in_hashmap( word, hashmap_words)
             overall_word_count.inc(key,1)  
             
 # =============================================================================

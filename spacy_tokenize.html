@@ -850,8 +850,8 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
 <pre class="cython line score-0">&#xA0;<span class="">086</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">087</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">088</span>: <span class="c"># --- Completedish ----       </span></pre>
-<pre class="cython line score-4" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">089</span>: <span class="k">cdef</span> <span class="kt">hash_t</span> <span class="nf">insert_in_hashmap</span><span class="p">(</span><span class="nb">bytes</span> <span class="n">word</span><span class="p">):</span></pre>
-<pre class='cython code score-4 '>static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashmap(PyObject *__pyx_v_word) {
+<pre class="cython line score-4" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">089</span>: <span class="k">cdef</span> <span class="kt">hash_t</span> <span class="nf">insert_in_hashmap</span><span class="p">(</span><span class="nb">bytes</span> <span class="n">word</span><span class="p">,</span> <span class="n">PreshMap</span> <span class="n">hashmap</span> <span class="p">):</span></pre>
+<pre class='cython code score-4 '>static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashmap(PyObject *__pyx_v_word, struct __pyx_obj_7preshed_4maps_PreshMap *__pyx_v_hashmap) {
   int __pyx_v_length;
   __pyx_t_5spacy_8typedefs_hash_t __pyx_v_key;
   __pyx_t_5spacy_7strings_Utf8Str *__pyx_v_value;
@@ -872,26 +872,26 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
 }
 </pre><pre class="cython line score-0">&#xA0;<span class="">090</span>:     <span class="sd">&#39;&#39;&#39;</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">091</span>: <span class="sd">    This function takes a string of bytes, hashes it into fixed width</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">092</span>: <span class="sd">    integer and then inserts it into the global hashmap</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">093</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">094</span>: <span class="sd">    Parameters</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">095</span>: <span class="sd">    ----------</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">096</span>: <span class="sd">    word : bytes</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">097</span>: <span class="sd">        utf-8 encoded bytes representing a python string</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">098</span>: </pre>
-<pre class="cython line score-0">&#xA0;<span class="">099</span>: <span class="sd">    Returns</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">100</span>: <span class="sd">    -------</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">101</span>: <span class="sd">    key : hash_t</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">102</span>: <span class="sd">        hased word into fixed intiger code</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">103</span>: <span class="sd">    &#39;&#39;&#39;</span></pre>
-<pre class="cython line score-0">&#xA0;<span class="">104</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">092</span>: <span class="sd">    integer and then inserts it into the hashmap while alocating memory </span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">093</span>: <span class="sd">    for it</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">094</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">095</span>: <span class="sd">    Parameters</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">096</span>: <span class="sd">    ----------</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">097</span>: <span class="sd">    word : bytes</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">098</span>: <span class="sd">        utf-8 encoded bytes representing a python string</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">099</span>: </pre>
+<pre class="cython line score-0">&#xA0;<span class="">100</span>: <span class="sd">    Returns</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">101</span>: <span class="sd">    -------</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">102</span>: <span class="sd">    key : hash_t</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">103</span>: <span class="sd">        hased word into fixed intiger code</span></pre>
+<pre class="cython line score-0">&#xA0;<span class="">104</span>: <span class="sd">    &#39;&#39;&#39;</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">105</span>:     <span class="k">cdef</span><span class="p">:</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">106</span>:         <span class="nb">int</span> <span class="n">length</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">107</span>:         <span class="n">hash_t</span> <span class="n">key</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">108</span>:         <span class="n">Utf8Str</span><span class="o">*</span> <span class="n">value</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">109</span>:         <span class="c">#  Pool deals with memory management </span></pre>
-<pre class="cython line score-1" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">110</span>:         <span class="n">Pool</span> <span class="n">mem</span> <span class="o">=</span> <span class="n">hashmap_words</span><span class="o">.</span><span class="n">mem</span></pre>
-<pre class='cython code score-1 '>  __pyx_t_1 = ((PyObject *)__pyx_v_14spacy_tokenize_hashmap_words-&gt;mem);
+<pre class="cython line score-1" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">110</span>:         <span class="n">Pool</span> <span class="n">mem</span> <span class="o">=</span> <span class="n">hashmap</span><span class="o">.</span><span class="n">mem</span></pre>
+<pre class='cython code score-1 '>  __pyx_t_1 = ((PyObject *)__pyx_v_hashmap-&gt;mem);
   <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
   __pyx_v_mem = ((struct __pyx_obj_5cymem_5cymem_Pool *)__pyx_t_1);
   __pyx_t_1 = 0;
@@ -912,15 +912,15 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
   __pyx_t_3 = <span class='pyx_c_api'>__Pyx_PyBytes_AsWritableString</span>(__pyx_v_word); if (unlikely((!__pyx_t_3) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 114, __pyx_L1_error)</span>
   __pyx_v_key = __pyx_f_5spacy_7strings_hash_utf8(__pyx_t_3, __pyx_v_length);
 </pre><pre class="cython line score-0">&#xA0;<span class="">115</span>:     <span class="c"># here we are defining the pointer for our string </span></pre>
-<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">116</span>:     <span class="n">value</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">Utf8Str</span><span class="o">*&gt;</span><span class="n">hashmap_words</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></pre>
-<pre class='cython code score-0 '>  __pyx_v_value = ((__pyx_t_5spacy_7strings_Utf8Str *)((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_14spacy_tokenize_hashmap_words-&gt;__pyx_vtab)-&gt;get(__pyx_v_14spacy_tokenize_hashmap_words, __pyx_v_key));
+<pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">116</span>:     <span class="n">value</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">Utf8Str</span><span class="o">*&gt;</span><span class="n">hashmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></pre>
+<pre class='cython code score-0 '>  __pyx_v_value = ((__pyx_t_5spacy_7strings_Utf8Str *)((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_hashmap-&gt;__pyx_vtab)-&gt;get(__pyx_v_hashmap, __pyx_v_key));
 </pre><pre class="cython line score-0">&#xA0;<span class="">117</span>: </pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">118</span>:     <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">NULL</span><span class="p">:</span></pre>
 <pre class='cython code score-0 '>  __pyx_t_4 = ((__pyx_v_value != NULL) != 0);
   if (__pyx_t_4) {
 /* … */
   }
-</pre><pre class="cython line score-0">&#xA0;<span class="">119</span>:         <span class="c"># print(&#39;unicode:1&#39;,get_unicode(key, hashmap_words))</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">119</span>:         <span class="c"># print(&#39;unicode:1&#39;,get_unicode(key, hashmap))</span></pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">120</span>:         <span class="k">return</span> <span class="n">key</span></pre>
 <pre class='cython code score-0 '>    __pyx_r = __pyx_v_key;
     goto __pyx_L0;
@@ -935,9 +935,9 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
     __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyBytes_AsUString</span>(__pyx_v_word); if (unlikely((!__pyx_t_5) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 123, __pyx_L1_error)</span>
     __pyx_t_6 = __pyx_f_14spacy_tokenize__allocate(__pyx_v_mem, __pyx_t_5, __pyx_v_length);<span class='error_goto'> if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 123, __pyx_L1_error)</span>
     __pyx_v_value = __pyx_t_6;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">124</span>:         <span class="n">hashmap_words</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></pre>
-<pre class='cython code score-0 '>    ((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_14spacy_tokenize_hashmap_words-&gt;__pyx_vtab)-&gt;set(__pyx_v_14spacy_tokenize_hashmap_words, __pyx_v_key, __pyx_v_value);<span class='error_goto'> if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L1_error)</span>
-</pre><pre class="cython line score-0">&#xA0;<span class="">125</span>:         <span class="c"># print(&#39;unicode:2&#39;,get_unicode(key, hashmap_words))</span></pre>
+</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">124</span>:         <span class="n">hashmap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></pre>
+<pre class='cython code score-0 '>    ((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_hashmap-&gt;__pyx_vtab)-&gt;set(__pyx_v_hashmap, __pyx_v_key, __pyx_v_value);<span class='error_goto'> if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L1_error)</span>
+</pre><pre class="cython line score-0">&#xA0;<span class="">125</span>:         <span class="c"># print(&#39;unicode:2&#39;,get_unicode(key, hashmap))</span></pre>
 <pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">126</span>:         <span class="k">return</span> <span class="n">key</span></pre>
 <pre class='cython code score-0 '>    __pyx_r = __pyx_v_key;
     goto __pyx_L0;
@@ -1011,8 +1011,11 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
 /* … */
     }
     <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-</pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">139</span>:             <span class="n">key</span> <span class="o">=</span> <span class="n">insert_in_hashmap</span><span class="p">(</span> <span class="n">word</span><span class="p">)</span></pre>
-<pre class='cython code score-0 '>      __pyx_v_key = __pyx_f_14spacy_tokenize_insert_in_hashmap(__pyx_v_word);
+</pre><pre class="cython line score-2" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">139</span>:             <span class="n">key</span> <span class="o">=</span> <span class="n">insert_in_hashmap</span><span class="p">(</span> <span class="n">word</span><span class="p">,</span> <span class="n">hashmap_words</span><span class="p">)</span></pre>
+<pre class='cython code score-2 '>      __pyx_t_5 = ((PyObject *)__pyx_v_14spacy_tokenize_hashmap_words);
+      <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_5);
+      __pyx_v_key = __pyx_f_14spacy_tokenize_insert_in_hashmap(__pyx_v_word, ((struct __pyx_obj_7preshed_4maps_PreshMap *)__pyx_t_5));
+      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_5); __pyx_t_5 = 0;
 </pre><pre class="cython line score-0" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">140</span>:             <span class="n">overall_word_count</span><span class="o">.</span><span class="n">inc</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="mf">1</span><span class="p">)</span></pre>
 <pre class='cython code score-0 '>      __pyx_t_6 = ((struct __pyx_vtabstruct_7preshed_7counter_PreshCounter *)__pyx_v_14spacy_tokenize_overall_word_count-&gt;__pyx_vtab)-&gt;inc(__pyx_v_14spacy_tokenize_overall_word_count, __pyx_v_key, 1, 0);<span class='error_goto'> if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 140, __pyx_L1_error)</span>
 </pre><pre class="cython line score-0">&#xA0;<span class="">141</span>: </pre>

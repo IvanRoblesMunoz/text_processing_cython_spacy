@@ -3582,7 +3582,7 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashmap(PyObject *); /*proto*/
+static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashmap(PyObject *, struct __pyx_obj_7preshed_4maps_PreshMap *); /*proto*/
 static void __pyx_f_14spacy_tokenize_iterate_through_words(PyObject *); /*proto*/
 static PyObject *__pyx_f_14spacy_tokenize_preshcount_to_list(struct __pyx_obj_7preshed_7counter_PreshCounter *); /*proto*/
 static __pyx_t_5spacy_7strings_Utf8Str *__pyx_f_14spacy_tokenize__allocate(struct __pyx_obj_5cymem_5cymem_Pool *, unsigned char const *, uint32_t); /*proto*/
@@ -4456,12 +4456,12 @@ static PyObject *__pyx_pf_14spacy_tokenize_run_pipeline(CYTHON_UNUSED PyObject *
 /* "spacy_tokenize.pyx":89
  * 
  * # --- Completedish ----
- * cdef hash_t insert_in_hashmap(bytes word):             # <<<<<<<<<<<<<<
+ * cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):             # <<<<<<<<<<<<<<
  *     '''
  *     This function takes a string of bytes, hashes it into fixed width
  */
 
-static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashmap(PyObject *__pyx_v_word) {
+static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashmap(PyObject *__pyx_v_word, struct __pyx_obj_7preshed_4maps_PreshMap *__pyx_v_hashmap) {
   int __pyx_v_length;
   __pyx_t_5spacy_8typedefs_hash_t __pyx_v_key;
   __pyx_t_5spacy_7strings_Utf8Str *__pyx_v_value;
@@ -4482,17 +4482,17 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
   /* "spacy_tokenize.pyx":110
  *         Utf8Str* value
  *         #  Pool deals with memory management
- *         Pool mem = hashmap_words.mem             # <<<<<<<<<<<<<<
+ *         Pool mem = hashmap.mem             # <<<<<<<<<<<<<<
  * 
  *     length = len(word)
  */
-  __pyx_t_1 = ((PyObject *)__pyx_v_14spacy_tokenize_hashmap_words->mem);
+  __pyx_t_1 = ((PyObject *)__pyx_v_hashmap->mem);
   __Pyx_INCREF(__pyx_t_1);
   __pyx_v_mem = ((struct __pyx_obj_5cymem_5cymem_Pool *)__pyx_t_1);
   __pyx_t_1 = 0;
 
   /* "spacy_tokenize.pyx":112
- *         Pool mem = hashmap_words.mem
+ *         Pool mem = hashmap.mem
  * 
  *     length = len(word)             # <<<<<<<<<<<<<<
  *     # our hash table assumes prehashed key, so we hash it so to get a utf8 code
@@ -4510,7 +4510,7 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
  *     # our hash table assumes prehashed key, so we hash it so to get a utf8 code
  *     key = hash_utf8(word, length)             # <<<<<<<<<<<<<<
  *     # here we are defining the pointer for our string
- *     value = <Utf8Str*>hashmap_words.get(key)
+ *     value = <Utf8Str*>hashmap.get(key)
  */
   if (unlikely(__pyx_v_word == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
@@ -4522,17 +4522,17 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
   /* "spacy_tokenize.pyx":116
  *     key = hash_utf8(word, length)
  *     # here we are defining the pointer for our string
- *     value = <Utf8Str*>hashmap_words.get(key)             # <<<<<<<<<<<<<<
+ *     value = <Utf8Str*>hashmap.get(key)             # <<<<<<<<<<<<<<
  * 
  *     if value is not NULL:
  */
-  __pyx_v_value = ((__pyx_t_5spacy_7strings_Utf8Str *)((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_14spacy_tokenize_hashmap_words->__pyx_vtab)->get(__pyx_v_14spacy_tokenize_hashmap_words, __pyx_v_key));
+  __pyx_v_value = ((__pyx_t_5spacy_7strings_Utf8Str *)((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_hashmap->__pyx_vtab)->get(__pyx_v_hashmap, __pyx_v_key));
 
   /* "spacy_tokenize.pyx":118
- *     value = <Utf8Str*>hashmap_words.get(key)
+ *     value = <Utf8Str*>hashmap.get(key)
  * 
  *     if value is not NULL:             # <<<<<<<<<<<<<<
- *         # print('unicode:1',get_unicode(key, hashmap_words))
+ *         # print('unicode:1',get_unicode(key, hashmap))
  *         return key
  */
   __pyx_t_4 = ((__pyx_v_value != NULL) != 0);
@@ -4540,7 +4540,7 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
 
     /* "spacy_tokenize.pyx":120
  *     if value is not NULL:
- *         # print('unicode:1',get_unicode(key, hashmap_words))
+ *         # print('unicode:1',get_unicode(key, hashmap))
  *         return key             # <<<<<<<<<<<<<<
  * 
  *     else:
@@ -4549,10 +4549,10 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
     goto __pyx_L0;
 
     /* "spacy_tokenize.pyx":118
- *     value = <Utf8Str*>hashmap_words.get(key)
+ *     value = <Utf8Str*>hashmap.get(key)
  * 
  *     if value is not NULL:             # <<<<<<<<<<<<<<
- *         # print('unicode:1',get_unicode(key, hashmap_words))
+ *         # print('unicode:1',get_unicode(key, hashmap))
  *         return key
  */
   }
@@ -4561,8 +4561,8 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
  * 
  *     else:
  *         value = _allocate(mem, word, length)             # <<<<<<<<<<<<<<
- *         hashmap_words.set(key, value)
- *         # print('unicode:2',get_unicode(key, hashmap_words))
+ *         hashmap.set(key, value)
+ *         # print('unicode:2',get_unicode(key, hashmap))
  */
   /*else*/ {
     if (unlikely(__pyx_v_word == Py_None)) {
@@ -4576,15 +4576,15 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
     /* "spacy_tokenize.pyx":124
  *     else:
  *         value = _allocate(mem, word, length)
- *         hashmap_words.set(key, value)             # <<<<<<<<<<<<<<
- *         # print('unicode:2',get_unicode(key, hashmap_words))
+ *         hashmap.set(key, value)             # <<<<<<<<<<<<<<
+ *         # print('unicode:2',get_unicode(key, hashmap))
  *         return key
  */
-    ((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_14spacy_tokenize_hashmap_words->__pyx_vtab)->set(__pyx_v_14spacy_tokenize_hashmap_words, __pyx_v_key, __pyx_v_value); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L1_error)
+    ((struct __pyx_vtabstruct_7preshed_4maps_PreshMap *)__pyx_v_hashmap->__pyx_vtab)->set(__pyx_v_hashmap, __pyx_v_key, __pyx_v_value); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 124, __pyx_L1_error)
 
     /* "spacy_tokenize.pyx":126
- *         hashmap_words.set(key, value)
- *         # print('unicode:2',get_unicode(key, hashmap_words))
+ *         hashmap.set(key, value)
+ *         # print('unicode:2',get_unicode(key, hashmap))
  *         return key             # <<<<<<<<<<<<<<
  * 
  * 
@@ -4596,7 +4596,7 @@ static __pyx_t_5spacy_8typedefs_hash_t __pyx_f_14spacy_tokenize_insert_in_hashma
   /* "spacy_tokenize.pyx":89
  * 
  * # --- Completedish ----
- * cdef hash_t insert_in_hashmap(bytes word):             # <<<<<<<<<<<<<<
+ * cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):             # <<<<<<<<<<<<<<
  *     '''
  *     This function takes a string of bytes, hashes it into fixed width
  */
@@ -4641,7 +4641,7 @@ static void __pyx_f_14spacy_tokenize_iterate_through_words(PyObject *__pyx_v_byt
  * 
  *     for byte_sentence in byte_sentences:             # <<<<<<<<<<<<<<
  *         for word in byte_sentence:
- *             key = insert_in_hashmap( word)
+ *             key = insert_in_hashmap( word, hashmap_words)
  */
   if (unlikely(__pyx_v_byte_sentences == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
@@ -4664,7 +4664,7 @@ static void __pyx_f_14spacy_tokenize_iterate_through_words(PyObject *__pyx_v_byt
  * 
  *     for byte_sentence in byte_sentences:
  *         for word in byte_sentence:             # <<<<<<<<<<<<<<
- *             key = insert_in_hashmap( word)
+ *             key = insert_in_hashmap( word, hashmap_words)
  *             overall_word_count.inc(key,1)
  */
     if (unlikely(__pyx_v_byte_sentence == Py_None)) {
@@ -4687,15 +4687,18 @@ static void __pyx_f_14spacy_tokenize_iterate_through_words(PyObject *__pyx_v_byt
       /* "spacy_tokenize.pyx":139
  *     for byte_sentence in byte_sentences:
  *         for word in byte_sentence:
- *             key = insert_in_hashmap( word)             # <<<<<<<<<<<<<<
+ *             key = insert_in_hashmap( word, hashmap_words)             # <<<<<<<<<<<<<<
  *             overall_word_count.inc(key,1)
  * 
  */
-      __pyx_v_key = __pyx_f_14spacy_tokenize_insert_in_hashmap(__pyx_v_word);
+      __pyx_t_5 = ((PyObject *)__pyx_v_14spacy_tokenize_hashmap_words);
+      __Pyx_INCREF(__pyx_t_5);
+      __pyx_v_key = __pyx_f_14spacy_tokenize_insert_in_hashmap(__pyx_v_word, ((struct __pyx_obj_7preshed_4maps_PreshMap *)__pyx_t_5));
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
       /* "spacy_tokenize.pyx":140
  *         for word in byte_sentence:
- *             key = insert_in_hashmap( word)
+ *             key = insert_in_hashmap( word, hashmap_words)
  *             overall_word_count.inc(key,1)             # <<<<<<<<<<<<<<
  * 
  * # =============================================================================
@@ -4706,7 +4709,7 @@ static void __pyx_f_14spacy_tokenize_iterate_through_words(PyObject *__pyx_v_byt
  * 
  *     for byte_sentence in byte_sentences:
  *         for word in byte_sentence:             # <<<<<<<<<<<<<<
- *             key = insert_in_hashmap( word)
+ *             key = insert_in_hashmap( word, hashmap_words)
  *             overall_word_count.inc(key,1)
  */
     }
@@ -4717,7 +4720,7 @@ static void __pyx_f_14spacy_tokenize_iterate_through_words(PyObject *__pyx_v_byt
  * 
  *     for byte_sentence in byte_sentences:             # <<<<<<<<<<<<<<
  *         for word in byte_sentence:
- *             key = insert_in_hashmap( word)
+ *             key = insert_in_hashmap( word, hashmap_words)
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;

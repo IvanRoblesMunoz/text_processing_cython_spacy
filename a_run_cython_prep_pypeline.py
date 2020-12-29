@@ -47,18 +47,38 @@ nlp = spacy.load("en_core_web_sm",
                           "textcat"]
                  )
 
-# --- we want to modify the tokenizer so that it also splits on "|" or "\"" 
+
+# def expand_contractions(text: str) -> str:    
+#     flags = re.IGNORECASE | re.MULTILINE
+#     text = re.sub(
+#         r"\b(can)'?t\b",
+#         'can not', text,
+#         flags = flags
+#     )
+    
+#     return text
+
+# expand_contractions("I can't wait to go!")
+
+
+# --- we want to modify the tokenizer so that it also splits on 
+#"|" or "\"" or " \'" or "\' "
 # note: we need to use escape characters
-infix_re = re.compile(r'''\||\"''')
+infix_re = re.compile(r'''\||\"''')#'|[ \']|[\' ]''')
 
 def custom_tokenizer(nlp):
     return Tokenizer(nlp.vocab, infix_finditer=infix_re.finditer)
 nlp.tokenizer = custom_tokenizer(nlp)
 
 # Test that our regex infix works
-ts = nlp("This is |a|te\"st\'let")
+ts = nlp("This is |a|te\"st\'let \'se\' e isn't don't")
 for i in ts:
     print(i)
+
+
+
+
+
 
 
 # =============================================================================
@@ -68,16 +88,16 @@ for i in ts:
 import spacy_tokenize as st
 start_nlp = dt.now()
 sentences = [doc for doc  in nlp.pipe(sentences)]
-
 end_nlp = dt.now()
 
 start_pipeline = dt.now()
 res = st.run_pipeline(sentences)
 end_pipeline = dt.now()
 
+print('nlp time:', end_nlp-start_nlp)
 print('pipeline time:', end_pipeline-start_pipeline)
 
 
-# res = pd.DataFrame(res,
-#                    columns = ['word','frequency'])
+res = pd.DataFrame(res,
+                    columns = ['word','frequency'])
 
