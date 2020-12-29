@@ -5,7 +5,8 @@ Created on Wed Dec 23 13:07:58 2020
 
 @author: ivan
 """
-
+set
+a = {'a','a','b'}
 
 # =============================================================================
 # import libraries
@@ -39,7 +40,7 @@ data_path = nlp_path / "week3/data"
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
 
 
-def read_corpus(filename, rows=100000):
+def read_corpus(filename, rows=1000000):
     data = []
     counter = 0
     for line in open(filename, encoding="utf-8"):
@@ -134,7 +135,7 @@ sentences = [doc for doc in nlp.pipe(sentences)]
 end_nlp = dt.now()
 
 start_pipeline = dt.now()
-res = st.run_pipeline(sentences)
+res_overall, res_sentence = st.run_pipeline(sentences)
 end_pipeline = dt.now()
 
 print("read time:", end_read - start_read)
@@ -142,4 +143,7 @@ print("nlp time:", end_nlp - start_nlp)
 print("pipeline time:", end_pipeline - start_pipeline)
 
 
-res = pd.DataFrame(res, columns=["word", "frequency"])
+res_overall = pd.DataFrame(res_overall, columns=["word", "frequency"])
+res_sentence = pd.DataFrame(res_sentence, columns=["word", "insentence"])
+
+results = pd.merge(res_overall,res_sentence, on = ['word'])

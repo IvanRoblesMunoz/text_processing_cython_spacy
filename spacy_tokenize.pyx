@@ -51,10 +51,12 @@ from libcpp cimport bool
 # define global objects
 cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
 cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
+cdef PreshCounter word_in_sentences_count = PreshCounter(initial_size=256)
+
 
 def run_pipeline(list sentences ):
     cdef:
-        list byte_sentence, byte_sentences, results
+        list byte_sentence, byte_sentences, results_overall, results_sentence
         # TokenC word
         Doc words
     
@@ -71,16 +73,24 @@ def run_pipeline(list sentences ):
     iterate_through_words(byte_sentences) 
     end_insert = dt.now()
     
-    # --- read counter ---
+    # --- read counter (all word occurences)---
     start_read_count = dt.now()
-    results = preshcount_to_list(overall_word_count)
+    results_overall = preshcount_to_list(overall_word_count)
     end_read_count = dt.now()
+    
+    # --- read counter (occurences in sentences) ---
+    start_count_sent_read = dt.now()
+    results_sentence = preshcount_to_list(word_in_sentences_count)
+    end_count_sent_read= dt.now()
+    
     
     print('convert time: ',end_convert - start_convert)
     print('insert time: ',end_insert - start_insert)
     print('read counter time: ',end_read_count - start_read_count)    
+    print('read counter time: ',end_count_sent_read - start_count_sent_read)    
     
-    return results
+    
+    return results_overall, results_sentence
     
     
         
@@ -125,19 +135,39 @@ cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
         # print('unicode:2',get_unicode(key, hashmap))
         return key
              
-     
+
+from libc.stdlib cimport malloc, free
+
 cdef void iterate_through_words(list byte_sentences):
     ''' This function iterates through the words and generates the counters
     '''
     cdef:
         list byte_sentence
+        int length
         bytes word
-        hash_t key
+        hash_t key_overall, key_sentence
+        PreshMap words_in_sentence 
+        long value_sentence
+        
+    words_in_sentence = PreshMap(initial_size=1024)
         
     for byte_sentence in byte_sentences:
+        words_in_sentence = PreshMap(initial_size=1024)
         for word in byte_sentence:
-            key = insert_in_hashmap( word, hashmap_words)
-            overall_word_count.inc(key,1)  
+            # --- insert in overall hashmap ---
+            key_overall = insert_in_hashmap( word, hashmap_words)
+            # --- insert in overall word count --
+            overall_word_count.inc(key_overall,1)
+            # --- insert in sentence hashmap ---
+            key_overall = insert_in_hashmap( word, words_in_sentence)
+        
+        for key_sentence, value_sentence in words_in_sentence.items():
+            word_in_sentences_count.inc(key_sentence,1)
+            # print(get_unicode(key_overall, words_in_sentence))
+            
+            
+            
+            
             
 # =============================================================================
 # Completed functions
@@ -172,7 +202,7 @@ cdef list preshcount_to_list(PreshCounter counter):
     return results            
 
 # =============================================================================
-# extertnal functions
+# external functions
 # =============================================================================
 # Functions from fast BOW
 # https://medium.com/glose-team/%EF%B8%8F-fast-bag-of-words-using-spacy-and-cython-574c308a9ff3
