@@ -40,7 +40,7 @@ data_path = nlp_path / "week3/data"
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
 
 
-def read_corpus(filename, rows=1000000):
+def read_corpus(filename, rows=10000):
     data = []
     counter = 0
     for line in open(filename, encoding="utf-8"):
@@ -53,10 +53,12 @@ def read_corpus(filename, rows=1000000):
     return data
 
 
+
 # import data
 start_read = dt.now()
 sentences = read_corpus(data_path / "train.tsv")
 end_read = dt.now()
+
 
 # --- Load spacy English ---
 import spacy
@@ -124,9 +126,9 @@ nlp.tokenizer = Tokenizer(
 #     print(i)
 
 
-# =============================================================================
-# generate spacy docs and run cython preprocessing steps
-# =============================================================================
+# # =============================================================================
+# # generate spacy docs and run cython preprocessing steps
+# # =============================================================================
 
 import spacy_tokenize as st
 
@@ -135,7 +137,7 @@ sentences = [doc for doc in nlp.pipe(sentences)]
 end_nlp = dt.now()
 
 start_pipeline = dt.now()
-res_overall, res_sentence = st.run_pipeline(sentences)
+res_overall, res_sentence = st.count_words(sentences)
 end_pipeline = dt.now()
 
 print("read time:", end_read - start_read)
@@ -147,3 +149,9 @@ res_overall = pd.DataFrame(res_overall, columns=["word", "frequency"])
 res_sentence = pd.DataFrame(res_sentence, columns=["word", "insentence"])
 
 results = pd.merge(res_overall,res_sentence, on = ['word'])
+
+
+res_overall, res_sentence = st.check_if_things_still_exist()
+
+st.free_python()
+

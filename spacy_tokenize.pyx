@@ -50,11 +50,30 @@ from libcpp cimport bool
 
 # define global objects
 cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
+cdef PreshMap words_to_keep = PreshMap(initial_size=1024)
 cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
 cdef PreshCounter word_in_sentences_count = PreshCounter(initial_size=256)
+cdef list byte_sentences = []
 
 
-def run_pipeline(list sentences ):
+def count_words(list sentences ):
+    '''
+    This function takes a list of sentences and counts the number of times
+    each word appears and the number sentneces in which that word appears
+
+    Parameters
+    ----------
+    list sentences : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    results_overall : TYPE
+        DESCRIPTION.
+    results_sentence : TYPE
+        DESCRIPTION.
+
+    '''
     cdef:
         list byte_sentence, byte_sentences, results_overall, results_sentence
         # TokenC word
@@ -83,19 +102,89 @@ def run_pipeline(list sentences ):
     results_sentence = preshcount_to_list(word_in_sentences_count)
     end_count_sent_read= dt.now()
     
-    
     print('convert time: ',end_convert - start_convert)
     print('insert time: ',end_insert - start_insert)
     print('read counter time: ',end_read_count - start_read_count)    
     print('read counter time: ',end_count_sent_read - start_count_sent_read)    
     
-    
     return results_overall, results_sentence
     
     
+def remove_unwanted_words():
+    for byte_sentence in byte_sentences:
+            print(byte_sentence)
+
+            
+   
+# =============================================================================
+# Completed functions
+# =============================================================================
+cdef list preshcount_to_list(PreshCounter counter):
+    '''
+    This function takes a counter and the global object hashmap_words and 
+    returns 
+    Parameters
+    ----------
+    PreshCounter counter : PreshCounter
+        DESCRIPTION.
         
-    
-# --- Completedish ----       
+    Returns
+    -------
+    results : list 
+        list of lists containing [unicode word, number of times in the text]
+    '''
+    cdef:
+        list results
+        int i, freq
+        hash_t wordhash
+
+    results = []
+    for i in range(counter.c_map.length):
+        wordhash = counter.c_map.cells[i].key
+        if wordhash != 0:
+            freq = <count_t>counter.c_map.cells[i].value
+            # returning the acctual words takes ~ 2x longer than returning utf8 keys
+            results.append([get_unicode(wordhash, hashmap_words),freq])
+        
+    return results            
+
+
+cdef void iterate_through_words(list byte_sentences):
+    ''' This function iterates through the words and generates the counters 
+       for how many times a word appears overall, and in how many sentences
+       it appears, as well as a hashmap of all available words.
+    '''
+    cdef:
+        list byte_sentence
+        int length
+        bytes word
+        hash_t key_overall, key_sentence
+        PreshMap words_in_sentence 
+        # long value_sentence
+        
+    words_in_sentence = PreshMap(initial_size=1024)
+        
+    for byte_sentence in byte_sentences:
+        words_in_sentence = PreshMap(initial_size=1024)
+        for word in byte_sentence:
+            # --- insert in overall hashmap ---
+            key_overall = insert_in_hashmap( word, hashmap_words)
+            # --- insert in overall word count --
+            overall_word_count.inc(key_overall,1)
+            # --- insert in sentence hashmap ---
+            key_overall = insert_in_hashmap( word, words_in_sentence)
+        
+        for key_sentence in words_in_sentence.keys():
+            word_in_sentences_count.inc(key_sentence,1)
+        # --- dealocate memory ---
+        # To do: check if this acctually deletes anything
+        # import psutil
+        # for _ in range(10):
+        #     simple_test(10)
+        #     print(psutil.virtual_memory().percent)
+        del words_in_sentence
+            
+
 cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
     '''
     This function takes a string of bytes, hashes it into fixed width
@@ -135,71 +224,6 @@ cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
         # print('unicode:2',get_unicode(key, hashmap))
         return key
              
-
-from libc.stdlib cimport malloc, free
-
-cdef void iterate_through_words(list byte_sentences):
-    ''' This function iterates through the words and generates the counters
-    '''
-    cdef:
-        list byte_sentence
-        int length
-        bytes word
-        hash_t key_overall, key_sentence
-        PreshMap words_in_sentence 
-        long value_sentence
-        
-    words_in_sentence = PreshMap(initial_size=1024)
-        
-    for byte_sentence in byte_sentences:
-        words_in_sentence = PreshMap(initial_size=1024)
-        for word in byte_sentence:
-            # --- insert in overall hashmap ---
-            key_overall = insert_in_hashmap( word, hashmap_words)
-            # --- insert in overall word count --
-            overall_word_count.inc(key_overall,1)
-            # --- insert in sentence hashmap ---
-            key_overall = insert_in_hashmap( word, words_in_sentence)
-        
-        for key_sentence, value_sentence in words_in_sentence.items():
-            word_in_sentences_count.inc(key_sentence,1)
-            # print(get_unicode(key_overall, words_in_sentence))
-            
-            
-            
-            
-            
-# =============================================================================
-# Completed functions
-# =============================================================================
-cdef list preshcount_to_list(PreshCounter counter):
-    '''
-    This function takes a counter and the global object hashmap_words and 
-    returns 
-    Parameters
-    ----------
-    PreshCounter counter : PreshCounter
-        DESCRIPTION.
-        
-    Returns
-    -------
-    results : list 
-        list of lists containing [unicode word, number of times in the text]
-    '''
-    cdef:
-        list results
-        int i, freq
-        hash_t wordhash
-
-    results = []
-    for i in range(counter.c_map.length):
-        wordhash = counter.c_map.cells[i].key
-        if wordhash != 0:
-            freq = <count_t>counter.c_map.cells[i].value
-            # returning the acctual words takes ~ 2x longer than returning utf8 keys
-            results.append([get_unicode(wordhash, hashmap_words),freq])
-        
-    return results            
 
 # =============================================================================
 # external functions
