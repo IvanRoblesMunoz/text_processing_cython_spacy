@@ -41,6 +41,7 @@ def expand_contractions(phrase):
 
     # appostrophy misspelss (these are quite slow as each one needs to be don
     # one by one)
+    # To do: optimise and expand by merging and adding more exceptions
     phrase = re.sub(r"cant", "can not", phrase)
     phrase = re.sub(r"cannot", "can not", phrase)
     phrase = re.sub(r"doesnt", "does not", phrase)

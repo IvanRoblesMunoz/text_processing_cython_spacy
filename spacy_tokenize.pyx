@@ -45,10 +45,10 @@ from datetime import datetime as dt
 from libcpp cimport bool
 
 # =============================================================================
-# Work
+# Define global variables and objects
 # =============================================================================
 
-# define global objects
+
 cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
 cdef PreshMap words_to_keep = PreshMap(initial_size=1024)
 cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
@@ -56,6 +56,11 @@ cdef PreshCounter word_in_sentences_count = PreshCounter(initial_size=256)
 cdef list byte_sentences = []
 
 
+# =============================================================================
+# Completed functions
+# =============================================================================
+
+# --- Python functions ----------
 def count_words(list sentences ):
     '''
     This function takes a list of sentences and counts the number of times
@@ -63,25 +68,27 @@ def count_words(list sentences ):
 
     Parameters
     ----------
-    list sentences : TYPE
-        DESCRIPTION.
+    sentences list[Doc] : 
+        The sentences that we want to count the words for, containing spacy Doc
+        objects
 
     Returns
     -------
-    results_overall : TYPE
-        DESCRIPTION.
-    results_sentence : TYPE
-        DESCRIPTION.
-
+    results_overall : list[list[str, int]]
+        list of lists containing a list per word and the total count of times
+        the word appears
+    results_sentence : list[list[str, int]]
+        list of lists containing a list per word and the count of documents
+        the word appears in
     '''
     cdef:
-        list byte_sentence, byte_sentences, results_overall, results_sentence
+        list byte_sentence,  results_overall, results_sentence
         # TokenC word
         Doc words
     
     # --- convert python to cython ----
     start_convert = dt.now()
-    byte_sentences = []
+    # byte_sentences = []
     for words in sentences:
         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
         byte_sentences.append(byte_sentence)
@@ -108,17 +115,21 @@ def count_words(list sentences ):
     print('read counter time: ',end_count_sent_read - start_count_sent_read)    
     
     return results_overall, results_sentence
-    
-    
-def remove_unwanted_words():
-    for byte_sentence in byte_sentences:
-            print(byte_sentence)
 
-            
-   
-# =============================================================================
-# Completed functions
-# =============================================================================
+
+def get_byte_sentences():
+    '''
+    Returns the byte_sentence list
+
+    Returns
+    -------
+    byte_sentences : list[list[bytes]]
+        byte_sentence list containing the sentences in byte for
+    '''
+    return byte_sentences
+
+
+# --- cython functions -----
 cdef list preshcount_to_list(PreshCounter counter):
     '''
     This function takes a counter and the global object hashmap_words and 
@@ -177,7 +188,8 @@ cdef void iterate_through_words(list byte_sentences):
         for key_sentence in words_in_sentence.keys():
             word_in_sentences_count.inc(key_sentence,1)
         # --- dealocate memory ---
-        # To do: check if this acctually deletes anything
+        # To do: check if this acctually deletes anything (seems to work)
+        # at least for python lists
         # import psutil
         # for _ in range(10):
         #     simple_test(10)
@@ -265,5 +277,4 @@ cdef unicode get_unicode(hash_t wordhash,PreshMap hashmap):
         raise KeyError(f'{wordhash} not in hash table')
     else:
         return decode_Utf8Str(utf8str)
-        
         

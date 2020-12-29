@@ -40,7 +40,7 @@ data_path = nlp_path / "week3/data"
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
 
 
-def read_corpus(filename, rows=10000):
+def read_corpus(filename, rows=100000):
     data = []
     counter = 0
     for line in open(filename, encoding="utf-8"):
@@ -146,12 +146,8 @@ print("pipeline time:", end_pipeline - start_pipeline)
 
 
 res_overall = pd.DataFrame(res_overall, columns=["word", "frequency"])
-res_sentence = pd.DataFrame(res_sentence, columns=["word", "insentence"])
+res_sentence = pd.DataFrame(res_sentence, columns=["word", "in_sentence"])
 
 results = pd.merge(res_overall,res_sentence, on = ['word'])
 
-
-res_overall, res_sentence = st.check_if_things_still_exist()
-
-st.free_python()
-
+st.get_byte_sentences()
