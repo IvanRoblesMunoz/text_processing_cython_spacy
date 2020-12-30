@@ -6,7 +6,7 @@ Created on Wed Dec 23 13:07:58 2020
 @author: ivan
 """
 set
-a = {'a','a','b'}
+a = {"a", "a", "b"}
 
 # =============================================================================
 # import libraries
@@ -51,7 +51,6 @@ def read_corpus(filename, rows=100000):
         if counter >= rows:
             break
     return data
-
 
 
 # import data
@@ -140,14 +139,34 @@ start_pipeline = dt.now()
 res_overall, res_sentence = st.count_words(sentences)
 end_pipeline = dt.now()
 
-print("read time:", end_read - start_read)
-print("nlp time:", end_nlp - start_nlp)
-print("pipeline time:", end_pipeline - start_pipeline)
+
 
 
 res_overall = pd.DataFrame(res_overall, columns=["word", "frequency"])
 res_sentence = pd.DataFrame(res_sentence, columns=["word", "in_sentence"])
 
-results = pd.merge(res_overall,res_sentence, on = ['word'])
+results = pd.merge(res_overall, res_sentence, on=["word"])
 
-st.get_byte_sentences()
+start_generate_remove_hash = dt.now()
+# x2 faster than using python although this is a very fast step anyways
+st.call_word_remove_hashmap(
+    min_count=1,
+    max_doc=5,
+    other_words=["and", "the", "stopword", "repeat", "repeat"],
+)
+end_generate_remove_hash = dt.now()
+
+
+
+start_generate_remove_hash2 = dt.now()
+results = pd.merge(res_overall, res_sentence, on=["word"])
+rem_words = set(results[(results["frequency"]<=1)|
+                        (results["in_sentence"]<=5)]['word'])
+
+end_generate_remove_hash2 = dt.now()
+
+print("read time:", end_read - start_read)
+print("nlp time:", end_nlp - start_nlp)
+print("pipeline time:", end_pipeline - start_pipeline)
+print("remove_hash time:", end_generate_remove_hash - start_generate_remove_hash)
+print("remove_hash time2:", end_generate_remove_hash2 - start_generate_remove_hash2)
