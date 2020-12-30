@@ -42,20 +42,91 @@ cimport numpy as np
 from tqdm import tqdm
 from datetime import datetime as dt
 
-from libcpp cimport bool
 
 # =============================================================================
 # Define global variables and objects
 # =============================================================================
 
 
-cdef PreshMap hashmap_words = PreshMap(initial_size=1024)
-cdef PreshMap words_to_keep = PreshMap(initial_size=1024)
-cdef PreshCounter overall_word_count = PreshCounter(initial_size=256)
-cdef PreshCounter word_in_sentences_count = PreshCounter(initial_size=256)
+cdef PreshMap hashmap_all_words = PreshMap(initial_size=1024)
+cdef PreshMap hashmap_words_to_remove = PreshMap(initial_size=1024)
+
+cdef PreshCounter counter_overall_word = PreshCounter(initial_size=256)
+cdef PreshCounter counter_word_in_sentences = PreshCounter(initial_size=256)
+
 cdef list byte_sentences = []
+cdef list removed_word_sentences = []
 
+# =============================================================================
+# work
+# =============================================================================
 
+cdef void generate_word_remove_hashmap(int min_count,
+                                       int max_doc,
+                                       list other_words = []):
+    cdef:
+        hash_t key_word_remove
+        int freq_overall, freq_sentence, length
+        str other_word_remove
+        Pool mem = hashmap_words_to_remove.mem
+        Utf8Str* value
+        unicode unicode_word
+        bytes byte_word
+
+    # --- insert other_words that we want to remove ----
+    for other_word_remove in other_words:
+        length = len(other_word_remove)
+        byte_word = bytes(other_word_remove.lower(), "utf-8")
+        key_word_remove = hash_utf8(byte_word, length)
+        value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
+        
+        if value is NULL:
+            value = _allocate(mem, byte_word, length)
+            hashmap_words_to_remove.set(key_word_remove, value)
+    
+    # --- check if any of word is outside the bounds specified and insert ---
+    
+    for key_word_remove in hashmap_all_words.keys():
+        # print(freq_overall)
+        freq_overall = counter_overall_word[key_word_remove]
+
+        if freq_overall <= min_count:
+            value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
+            
+            if value is NULL:
+                unicode_word = get_unicode(key_word_remove,hashmap_all_words )
+                byte_word = unicode_word.encode('utf-8')
+                
+                value = _allocate(mem, byte_word, length)                
+                hashmap_words_to_remove.set(key_word_remove, value)
+
+        freq_sentence = counter_word_in_sentences[key_word_remove]
+        if freq_overall >= max_doc:
+            value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
+
+            if value is NULL:
+                unicode_word = get_unicode(key_word_remove,hashmap_all_words )
+                byte_word = unicode_word.encode('utf-8')
+                
+                value = _allocate(mem, byte_word, length)                
+                hashmap_words_to_remove.set(key_word_remove, value)
+
+# cdef preshmap_to_list():
+    
+        
+def call_word_remove_hashmap(
+        min_count = 100,
+        max_doc = 90000,
+        other_words = []
+        ):
+                             
+    generate_word_remove_hashmap(
+        min_count = min_count,
+        max_doc = max_doc,
+        other_words = other_words
+        )
+    
+    
 # =============================================================================
 # Completed functions
 # =============================================================================
@@ -101,12 +172,12 @@ def count_words(list sentences ):
     
     # --- read counter (all word occurences)---
     start_read_count = dt.now()
-    results_overall = preshcount_to_list(overall_word_count)
+    results_overall = preshcount_to_list(counter_overall_word)
     end_read_count = dt.now()
     
     # --- read counter (occurences in sentences) ---
     start_count_sent_read = dt.now()
-    results_sentence = preshcount_to_list(word_in_sentences_count)
+    results_sentence = preshcount_to_list(counter_word_in_sentences)
     end_count_sent_read= dt.now()
     
     print('convert time: ',end_convert - start_convert)
@@ -132,7 +203,7 @@ def get_byte_sentences():
 # --- cython functions -----
 cdef list preshcount_to_list(PreshCounter counter):
     '''
-    This function takes a counter and the global object hashmap_words and 
+    This function takes a counter and the global object hashmap_all_words and 
     returns 
     Parameters
     ----------
@@ -155,7 +226,7 @@ cdef list preshcount_to_list(PreshCounter counter):
         if wordhash != 0:
             freq = <count_t>counter.c_map.cells[i].value
             # returning the acctual words takes ~ 2x longer than returning utf8 keys
-            results.append([get_unicode(wordhash, hashmap_words),freq])
+            results.append([get_unicode(wordhash, hashmap_all_words),freq])
         
     return results            
 
@@ -179,14 +250,14 @@ cdef void iterate_through_words(list byte_sentences):
         words_in_sentence = PreshMap(initial_size=1024)
         for word in byte_sentence:
             # --- insert in overall hashmap ---
-            key_overall = insert_in_hashmap( word, hashmap_words)
+            key_overall = insert_in_hashmap( word, hashmap_all_words)
             # --- insert in overall word count --
-            overall_word_count.inc(key_overall,1)
+            counter_overall_word.inc(key_overall,1)
             # --- insert in sentence hashmap ---
             key_overall = insert_in_hashmap( word, words_in_sentence)
         
         for key_sentence in words_in_sentence.keys():
-            word_in_sentences_count.inc(key_sentence,1)
+            counter_word_in_sentences.inc(key_sentence,1)
         # --- dealocate memory ---
         # To do: check if this acctually deletes anything (seems to work)
         # at least for python lists
