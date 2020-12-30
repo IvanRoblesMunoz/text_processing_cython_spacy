@@ -39,8 +39,8 @@ from spacy.structs cimport TokenC
 import numpy as np # Sometime we have a fail to import numpy compilation error if we don't import numpy
 cimport numpy as np
 
-from tqdm import tqdm
 from datetime import datetime as dt
+from libcpp cimport bool
 
 
 # =============================================================================
@@ -61,9 +61,87 @@ cdef list removed_word_sentences = []
 # work
 # =============================================================================
 
+def call_reset_global_variables():
+    reset_global_variables()
+    
+cdef void reset_global_variables():
+    global hashmap_all_words
+    global hashmap_words_to_remove
+    global counter_overall_word
+    global counter_word_in_sentences
+    global byte_sentences
+    global removed_word_sentences
+    
+    # del hashmap_all_words
+    hashmap_all_words = PreshMap(initial_size=1024)
+    hashmap_words_to_remove = PreshMap(initial_size=1024)
+    counter_overall_word = PreshCounter(initial_size=256)
+    counter_word_in_sentences = PreshCounter(initial_size=256)
+    byte_sentences = []
+    removed_word_sentences = []
+
+    
+# =============================================================================
+# Completed functions
+# =============================================================================
+
+def call_remove_words():
+    remove_words()
+    return removed_word_sentences
+
+cdef void remove_words():
+    cdef:
+        bytes word
+        list byte_sentence, utf8_sentence
+        int length
+        hash_t key
+    
+    for byte_sentence in byte_sentences:
+        utf8_sentence = []
+        for word in byte_sentence:
+            length = len(word)
+            utf8_word = hash_utf8(word, length)
+            value = <Utf8Str*>hashmap_words_to_remove.get(key)
+        
+            if value is NULL:
+                removed_word_sentences.append(word)
+                
+        removed_word_sentences.append(utf8_sentence)
+  
+
+def call_word_remove_hashmap(
+        min_count = 100,
+        max_doc = 90000,
+        other_words = []
+        ):
+    '''
+    Calls a function that generates a hashmap with all the words that we want
+    to remove.
+
+    Parameters
+    ----------
+    min_count : int
+        minimum times the word must appear in total
+    max_doc : int
+        maximum number of documents the word can appear in to keep it
+    other_words : list[str]
+        list of other words we want to remove
+    '''
+                             
+    generate_word_remove_hashmap(
+        min_count = min_count,
+        max_doc = max_doc,
+        other_words = other_words
+        )
+    
+    
 cdef void generate_word_remove_hashmap(int min_count,
                                        int max_doc,
                                        list other_words = []):
+    ''' 
+    generates a hashmap of words we want to remove based on 
+    the arguments passed
+    '''
     cdef:
         hash_t key_word_remove
         int freq_overall, freq_sentence, length
@@ -72,6 +150,7 @@ cdef void generate_word_remove_hashmap(int min_count,
         Utf8Str* value
         unicode unicode_word
         bytes byte_word
+        bool value_in
 
     # --- insert other_words that we want to remove ----
     for other_word_remove in other_words:
@@ -87,49 +166,28 @@ cdef void generate_word_remove_hashmap(int min_count,
     # --- check if any of word is outside the bounds specified and insert ---
     
     for key_word_remove in hashmap_all_words.keys():
-        # print(freq_overall)
-        freq_overall = counter_overall_word[key_word_remove]
+        insert_value = True
 
+        freq_overall = counter_overall_word[key_word_remove]
         if freq_overall <= min_count:
+            
             value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
             
             if value is NULL:
-                unicode_word = get_unicode(key_word_remove,hashmap_all_words )
-                byte_word = unicode_word.encode('utf-8')
-                
-                value = _allocate(mem, byte_word, length)                
+                value = <Utf8Str*>hashmap_all_words.get(key_word_remove)
                 hashmap_words_to_remove.set(key_word_remove, value)
-
-        freq_sentence = counter_word_in_sentences[key_word_remove]
-        if freq_overall >= max_doc:
-            value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
-
-            if value is NULL:
-                unicode_word = get_unicode(key_word_remove,hashmap_all_words )
-                byte_word = unicode_word.encode('utf-8')
+                insert_value = False
                 
-                value = _allocate(mem, byte_word, length)                
-                hashmap_words_to_remove.set(key_word_remove, value)
+                
+        elif insert_value:
+            freq_sentence = counter_word_in_sentences[key_word_remove]
+            if freq_sentence >= max_doc:
+                value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
+    
+                if value is NULL:
+                    value = <Utf8Str*>hashmap_all_words.get(key_word_remove)         
+                    hashmap_words_to_remove.set(key_word_remove, value)
 
-# cdef preshmap_to_list():
-    
-        
-def call_word_remove_hashmap(
-        min_count = 100,
-        max_doc = 90000,
-        other_words = []
-        ):
-                             
-    generate_word_remove_hashmap(
-        min_count = min_count,
-        max_doc = max_doc,
-        other_words = other_words
-        )
-    
-    
-# =============================================================================
-# Completed functions
-# =============================================================================
 
 # --- Python functions ----------
 def count_words(list sentences ):
@@ -153,15 +211,19 @@ def count_words(list sentences ):
         the word appears in
     '''
     cdef:
-        list byte_sentence,  results_overall, results_sentence
+        list byte_sentence,  results_overall, results_sentence, utf8_sentence
         # TokenC word
         Doc words
+    
+    # --- reset global variables ---
+    reset_global_variables()
     
     # --- convert python to cython ----
     start_convert = dt.now()
     # byte_sentences = []
     for words in sentences:
-        byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+        byte_sentence = [bytes(word.text,'utf-8') for word in words]
+        utf8_sentence = []
         byte_sentences.append(byte_sentence)
     end_convert = dt.now()   
 
@@ -182,8 +244,8 @@ def count_words(list sentences ):
     
     print('convert time: ',end_convert - start_convert)
     print('insert time: ',end_insert - start_insert)
-    print('read counter time: ',end_read_count - start_read_count)    
-    print('read counter time: ',end_count_sent_read - start_count_sent_read)    
+    print('read overall_word counter time: ',end_read_count - start_read_count)    
+    print('read in_sentences counter time: ',end_count_sent_read - start_count_sent_read)    
     
     return results_overall, results_sentence
 
@@ -266,8 +328,31 @@ cdef void iterate_through_words(list byte_sentences):
         #     simple_test(10)
         #     print(psutil.virtual_memory().percent)
         del words_in_sentence
-            
+      
 
+  
+def get_remove_words():        
+    res_list = hashmap_to_list(hashmap_words_to_remove)
+    return res_list
+    
+cdef list hashmap_to_list(PreshMap hashmap):
+    ''' converts hashmap keys to list as a byte '''
+    cdef list res_list = []
+    cdef hash_t key
+    cdef unicode word
+    cdef bytes byte_word
+    cdef Utf8Str* value
+    
+    for key in hashmap.keys():
+            value = <Utf8Str*>hashmap.get(key)
+            if value is not NULL:
+                word = get_unicode(key, hashmap)
+                byte_word = word.encode('utf-8')
+                res_list.append(byte_word)
+            
+    return res_list
+        
+@cython.final
 cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
     '''
     This function takes a string of bytes, hashes it into fixed width

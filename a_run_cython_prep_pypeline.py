@@ -5,8 +5,6 @@ Created on Wed Dec 23 13:07:58 2020
 
 @author: ivan
 """
-set
-a = {"a", "a", "b"}
 
 # =============================================================================
 # import libraries
@@ -38,13 +36,13 @@ data_path = nlp_path / "week3/data"
 
 # Test expand_contractions function
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
+# Adding the lower() step here makes nlp() step faster
 
-
-def read_corpus(filename, rows=100000):
+def read_corpus(filename, rows=1000000):
     data = []
     counter = 0
     for line in open(filename, encoding="utf-8"):
-        line = line.strip().split("\t")[0]
+        line = line.strip().split("\t")[0].lower()
         line = ph.expand_contractions(line)
         data.append(line)
         counter += 1
@@ -140,33 +138,41 @@ res_overall, res_sentence = st.count_words(sentences)
 end_pipeline = dt.now()
 
 
-
-
 res_overall = pd.DataFrame(res_overall, columns=["word", "frequency"])
 res_sentence = pd.DataFrame(res_sentence, columns=["word", "in_sentence"])
 
 results = pd.merge(res_overall, res_sentence, on=["word"])
 
+# import nltk
+from nltk.corpus import stopwords
+stopwords = stopwords.words('english')
+# stopwords = [i for i in stopwords if "'" not in i]
+
 start_generate_remove_hash = dt.now()
 # x2 faster than using python although this is a very fast step anyways
 st.call_word_remove_hashmap(
-    min_count=1,
-    max_doc=5,
-    other_words=["and", "the", "stopword", "repeat", "repeat"],
+    min_count=5,
+    max_doc=int(len(sentences)*0.79),
+    other_words=stopwords,
 )
 end_generate_remove_hash = dt.now()
 
-
-
-start_generate_remove_hash2 = dt.now()
-results = pd.merge(res_overall, res_sentence, on=["word"])
-rem_words = set(results[(results["frequency"]<=1)|
-                        (results["in_sentence"]<=5)]['word'])
-
-end_generate_remove_hash2 = dt.now()
+start_removed_words = dt.now()
+rem_words = st.call_remove_words()
+end_removed_words = dt.now()
 
 print("read time:", end_read - start_read)
 print("nlp time:", end_nlp - start_nlp)
 print("pipeline time:", end_pipeline - start_pipeline)
 print("remove_hash time:", end_generate_remove_hash - start_generate_remove_hash)
-print("remove_hash time2:", end_generate_remove_hash2 - start_generate_remove_hash2)
+print("removed_words time:", end_removed_words - start_removed_words)
+
+rem_words_hash = st.get_remove_words()
+rem_words_hash = [i.decode("utf-8") for i in rem_words_hash]
+rem_words_hash = pd.DataFrame(data = rem_words_hash,
+                              columns = ['remove_words'])
+
+
+results = rem_words_hash.merge(results, left_on=['remove_words'],
+                                right_on=['word'], how = 'outer')
+
