@@ -38,18 +38,35 @@ def expand_contractions(phrase):
     # specific
     phrase = re.sub(r"won\'t", "will not", phrase)
     phrase = re.sub(r"can\'t", "can not", phrase)
-
+    
+    # ('nt) general case for appostrophe misspels
+    list_general = ["are","can","dare","did","do","does", "has", "have",
+                    "had", "is", "may", "might", "must","ought", "should",
+                    "was", "were",  "would"]
+    list_general = "|".join(list_general)
+    phrase = re.sub(f"(?<=[{list_general}])nt", " not", phrase)
+    
+    # ('re) general case for appostrophe misspels
+    list_general = ["you","we","they", "what"]
+    list_general = "|".join(list_general)
+    phrase = re.sub(f"(?<=[{list_general}])re", " not", phrase)   
+    
+    # ('s) general case for appostrophe misspels
+    list_general = ["he","she","that", "who", "what", "where", "when", "why",
+                    "how"]
+    list_general = "|".join(list_general)
+    phrase = re.sub(f"(?<=[{list_general}])re", " not", phrase)  
+    
+    # To do: add remaining
     # appostrophy misspelss (these are quite slow as each one needs to be don
     # one by one)
     # To do: optimise and expand by merging and adding more exceptions
-    phrase = re.sub(r"cant", "can not", phrase)
-    phrase = re.sub(r"cannot", "can not", phrase)
-    phrase = re.sub(r"doesnt", "does not", phrase)
-    phrase = re.sub(r"dont", "do not", phrase)
-    phrase = re.sub(r"hasnt", "has not", phrase)
-    phrase = re.sub(r"shouldnt", "should not", phrase)
+    # https://www.enchantedlearning.com/grammar/contractions/list.shtml
     phrase = re.sub(r"lets", "let us", phrase)
-
+    phrase = re.sub(r"cannot", "can not", phrase)
+    phrase = re.sub(r"shant", "shall not", phrase)
+    phrase = re.sub(r"wont", "will not", phrase)
+    phrase = re.sub(r"im", "will not", phrase)
     # general
     phrase = re.sub(r"n\'t", " not", phrase)
     phrase = re.sub(r"\'re", " are", phrase)
@@ -60,6 +77,9 @@ def expand_contractions(phrase):
     phrase = re.sub(r"\'ve", " have", phrase)
     phrase = re.sub(r"\'m", " am", phrase)
     return phrase
+
+phrase =" dont hasnt "
+phrase = re.sub(r"(?<=[do|has])nt", " not", phrase)
 
 
 def combine_re(regex_list):

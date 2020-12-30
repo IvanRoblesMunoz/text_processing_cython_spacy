@@ -161,7 +161,7 @@ def count_words(list sentences ):
     start_convert = dt.now()
     # byte_sentences = []
     for words in sentences:
-        byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+        byte_sentence = [bytes(word.text,'utf-8') for word in words]
         byte_sentences.append(byte_sentence)
     end_convert = dt.now()   
 

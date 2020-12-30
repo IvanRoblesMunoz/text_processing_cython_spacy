@@ -1091,7 +1091,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
 /* … */
   }
   <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-</pre><pre class="cython line score-65" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">164</span>:         <span class="n">byte_sentence</span> <span class="o">=</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">lower_</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span></pre>
+</pre><pre class="cython line score-65" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">164</span>:         <span class="n">byte_sentence</span> <span class="o">=</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">,</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span></pre>
 <pre class='cython code score-65 '>    __pyx_t_3 = <span class='py_c_api'>PyList_New</span>(0);<span class='error_goto'> if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)</span>
     <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
     if (likely(<span class='py_c_api'>PyList_CheckExact</span>(((PyObject *)__pyx_v_words))) || <span class='py_c_api'>PyTuple_CheckExact</span>(((PyObject *)__pyx_v_words))) {
@@ -1135,7 +1135,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
       }
       <span class='pyx_macro_api'>__Pyx_XDECREF_SET</span>(__pyx_v_word, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_7 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_v_word, __pyx_n_s_lower);<span class='error_goto'> if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L1_error)</span>
+      __pyx_t_7 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(__pyx_v_word, __pyx_n_s_text);<span class='error_goto'> if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L1_error)</span>
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_7);
       __pyx_t_8 = <span class='py_c_api'>PyTuple_New</span>(2);<span class='error_goto'> if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 164, __pyx_L1_error)</span>
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_8);

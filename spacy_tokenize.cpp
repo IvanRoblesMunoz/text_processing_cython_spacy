@@ -3705,13 +3705,14 @@ static const char __pyx_k_size[] = "size";
 static const char __pyx_k_step[] = "step";
 static const char __pyx_k_stop[] = "stop";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_text[] = "text";
 static const char __pyx_k_tqdm[] = "tqdm";
 static const char __pyx_k_word[] = "word";
 static const char __pyx_k_ASCII[] = "ASCII";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_flags[] = "flags";
-static const char __pyx_k_lower[] = "lower_";
+static const char __pyx_k_lower[] = "lower";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_print[] = "print";
 static const char __pyx_k_range[] = "range";
@@ -3729,7 +3730,6 @@ static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_fortran[] = "fortran";
-static const char __pyx_k_lower_2[] = "lower";
 static const char __pyx_k_max_doc[] = "max_doc";
 static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
@@ -3877,7 +3877,6 @@ static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
 static PyObject *__pyx_n_s_keys;
 static PyObject *__pyx_n_s_lower;
-static PyObject *__pyx_n_s_lower_2;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_max_doc;
 static PyObject *__pyx_n_s_memview;
@@ -3934,6 +3933,7 @@ static PyObject *__pyx_kp_s_strided_and_indirect;
 static PyObject *__pyx_kp_s_stringsource;
 static PyObject *__pyx_n_s_struct;
 static PyObject *__pyx_n_s_test;
+static PyObject *__pyx_n_s_text;
 static PyObject *__pyx_n_s_tqdm;
 static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
@@ -3991,7 +3991,7 @@ static PyObject *__pyx_tp_new_array(PyTypeObject *t, PyObject *a, PyObject *k); 
 static PyObject *__pyx_tp_new_Enum(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_memoryview(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new__memoryviewslice(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static __Pyx_CachedCFunction __pyx_umethod_PyString_Type_lower = {0, &__pyx_n_s_lower_2, 0, 0, 0};
+static __Pyx_CachedCFunction __pyx_umethod_PyString_Type_lower = {0, &__pyx_n_s_lower, 0, 0, 0};
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_100;
@@ -4804,7 +4804,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
  *     start_convert = dt.now()
  *     # byte_sentences = []
  *     for words in sentences:             # <<<<<<<<<<<<<<
- *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.text,'utf-8') for word in words]
  *         byte_sentences.append(byte_sentence)
  */
   if (unlikely(__pyx_v_sentences == Py_None)) {
@@ -4827,7 +4827,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
     /* "spacy_tokenize.pyx":164
  *     # byte_sentences = []
  *     for words in sentences:
- *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]             # <<<<<<<<<<<<<<
+ *         byte_sentence = [bytes(word.text,'utf-8') for word in words]             # <<<<<<<<<<<<<<
  *         byte_sentences.append(byte_sentence)
  *     end_convert = dt.now()
  */
@@ -4874,7 +4874,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
       }
       __Pyx_XDECREF_SET(__pyx_v_word, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_word, __pyx_n_s_lower); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_word, __pyx_n_s_text); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 164, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 164, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
@@ -4896,7 +4896,7 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
 
     /* "spacy_tokenize.pyx":165
  *     for words in sentences:
- *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.text,'utf-8') for word in words]
  *         byte_sentences.append(byte_sentence)             # <<<<<<<<<<<<<<
  *     end_convert = dt.now()
  * 
@@ -4911,14 +4911,14 @@ static PyObject *__pyx_pf_14spacy_tokenize_2count_words(CYTHON_UNUSED PyObject *
  *     start_convert = dt.now()
  *     # byte_sentences = []
  *     for words in sentences:             # <<<<<<<<<<<<<<
- *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.text,'utf-8') for word in words]
  *         byte_sentences.append(byte_sentence)
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "spacy_tokenize.pyx":166
- *         byte_sentence = [bytes(word.lower_,'utf-8') for word in words]
+ *         byte_sentence = [bytes(word.text,'utf-8') for word in words]
  *         byte_sentences.append(byte_sentence)
  *     end_convert = dt.now()             # <<<<<<<<<<<<<<
  * 
@@ -20986,7 +20986,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
   {&__pyx_n_s_keys, __pyx_k_keys, sizeof(__pyx_k_keys), 0, 0, 1, 1},
   {&__pyx_n_s_lower, __pyx_k_lower, sizeof(__pyx_k_lower), 0, 0, 1, 1},
-  {&__pyx_n_s_lower_2, __pyx_k_lower_2, sizeof(__pyx_k_lower_2), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_max_doc, __pyx_k_max_doc, sizeof(__pyx_k_max_doc), 0, 0, 1, 1},
   {&__pyx_n_s_memview, __pyx_k_memview, sizeof(__pyx_k_memview), 0, 0, 1, 1},
@@ -21043,6 +21042,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_stringsource, __pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 0, 1, 0},
   {&__pyx_n_s_struct, __pyx_k_struct, sizeof(__pyx_k_struct), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+  {&__pyx_n_s_text, __pyx_k_text, sizeof(__pyx_k_text), 0, 0, 1, 1},
   {&__pyx_n_s_tqdm, __pyx_k_tqdm, sizeof(__pyx_k_tqdm), 0, 0, 1, 1},
   {&__pyx_kp_s_unable_to_allocate_array_data, __pyx_k_unable_to_allocate_array_data, sizeof(__pyx_k_unable_to_allocate_array_data), 0, 0, 1, 0},
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},

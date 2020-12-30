@@ -5,8 +5,6 @@ Created on Wed Dec 23 13:07:58 2020
 
 @author: ivan
 """
-set
-a = {"a", "a", "b"}
 
 # =============================================================================
 # import libraries
@@ -38,13 +36,13 @@ data_path = nlp_path / "week3/data"
 
 # Test expand_contractions function
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
-
+# Adding the lower() step here makes nlp() step faster
 
 def read_corpus(filename, rows=100000):
     data = []
     counter = 0
     for line in open(filename, encoding="utf-8"):
-        line = line.strip().split("\t")[0]
+        line = line.strip().split("\t")[0].lower()
         line = ph.expand_contractions(line)
         data.append(line)
         counter += 1
