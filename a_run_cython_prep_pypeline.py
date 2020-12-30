@@ -38,7 +38,7 @@ data_path = nlp_path / "week3/data"
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
 # Adding the lower() step here makes nlp() step faster
 
-def read_corpus(filename, rows=100000):
+def read_corpus(filename, rows=1000000):
     data = []
     counter = 0
     for line in open(filename, encoding="utf-8"):
@@ -143,7 +143,7 @@ res_sentence = pd.DataFrame(res_sentence, columns=["word", "in_sentence"])
 
 results = pd.merge(res_overall, res_sentence, on=["word"])
 
-import nltk
+# import nltk
 from nltk.corpus import stopwords
 stopwords = stopwords.words('english')
 # stopwords = [i for i in stopwords if "'" not in i]
@@ -152,7 +152,7 @@ start_generate_remove_hash = dt.now()
 # x2 faster than using python although this is a very fast step anyways
 st.call_word_remove_hashmap(
     min_count=5,
-    max_doc=int(len(sentences)*0.8),
+    max_doc=int(len(sentences)*0.79),
     other_words=stopwords,
 )
 end_generate_remove_hash = dt.now()
@@ -167,11 +167,12 @@ print("pipeline time:", end_pipeline - start_pipeline)
 print("remove_hash time:", end_generate_remove_hash - start_generate_remove_hash)
 print("removed_words time:", end_removed_words - start_removed_words)
 
-rem_words_hash = st.get_remove_sentences()
+rem_words_hash = st.get_remove_words()
 rem_words_hash = [i.decode("utf-8") for i in rem_words_hash]
 rem_words_hash = pd.DataFrame(data = rem_words_hash,
-                              columns = ['word2'])
+                              columns = ['remove_words'])
 
 
-validate = rem_words_hash.merge(results, left_on=['word2'],
-                                right_on=['word'], how = 'left')
+results = rem_words_hash.merge(results, left_on=['remove_words'],
+                                right_on=['word'], how = 'outer')
+

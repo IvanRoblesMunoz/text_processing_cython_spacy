@@ -61,6 +61,30 @@ cdef list removed_word_sentences = []
 # work
 # =============================================================================
 
+def call_reset_global_variables():
+    reset_global_variables()
+    
+cdef void reset_global_variables():
+    global hashmap_all_words
+    global hashmap_words_to_remove
+    global counter_overall_word
+    global counter_word_in_sentences
+    global byte_sentences
+    global removed_word_sentences
+    
+    # del hashmap_all_words
+    hashmap_all_words = PreshMap(initial_size=1024)
+    hashmap_words_to_remove = PreshMap(initial_size=1024)
+    counter_overall_word = PreshCounter(initial_size=256)
+    counter_word_in_sentences = PreshCounter(initial_size=256)
+    byte_sentences = []
+    removed_word_sentences = []
+
+    
+# =============================================================================
+# Completed functions
+# =============================================================================
+
 def call_remove_words():
     remove_words()
     return removed_word_sentences
@@ -84,40 +108,6 @@ cdef void remove_words():
                 
         removed_word_sentences.append(utf8_sentence)
   
-    
-  
-def get_remove_sentences():        
-    res_list = hashmap_to_list(hashmap_words_to_remove)
-    return res_list
-    
-cdef list hashmap_to_list(PreshMap hashmap):
-    cdef list res_list = []
-    cdef hash_t key
-    cdef unicode word
-    cdef bytes byte_word
-    cdef Utf8Str* value
-    
-    for key in hashmap.keys():
-        try:
-            value = <Utf8Str*>hashmap.get(key)
-            if value is not NULL:
-                word = get_unicode(key, hashmap)
-                byte_word = word.encode('utf-8')
-                res_list.append(byte_word)
-        except:
-            pass
-            
-    return res_list
-        
-    
-    
-            
-
-    
-# =============================================================================
-# Completed functions
-# =============================================================================
-
 
 def call_word_remove_hashmap(
         min_count = 100,
@@ -174,21 +164,20 @@ cdef void generate_word_remove_hashmap(int min_count,
             hashmap_words_to_remove.set(key_word_remove, value)
     
     # --- check if any of word is outside the bounds specified and insert ---
-    insert_value = True
+    
     for key_word_remove in hashmap_all_words.keys():
-        # print(freq_overall)
-        freq_overall = counter_overall_word[key_word_remove]
+        insert_value = True
 
+        freq_overall = counter_overall_word[key_word_remove]
         if freq_overall <= min_count:
+            
             value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
             
             if value is NULL:
-                unicode_word = get_unicode(key_word_remove,hashmap_all_words )
-                byte_word = unicode_word.encode('utf-8')
-                
-                value = _allocate(mem, byte_word, length)                
+                value = <Utf8Str*>hashmap_all_words.get(key_word_remove)
                 hashmap_words_to_remove.set(key_word_remove, value)
                 insert_value = False
+                
                 
         elif insert_value:
             freq_sentence = counter_word_in_sentences[key_word_remove]
@@ -196,11 +185,9 @@ cdef void generate_word_remove_hashmap(int min_count,
                 value = <Utf8Str*>hashmap_words_to_remove.get(key_word_remove)
     
                 if value is NULL:
-                    unicode_word = get_unicode(key_word_remove,hashmap_all_words )
-                    byte_word = unicode_word.encode('utf-8')
-                    
-                    value = _allocate(mem, byte_word, length)                
+                    value = <Utf8Str*>hashmap_all_words.get(key_word_remove)         
                     hashmap_words_to_remove.set(key_word_remove, value)
+
 
 # --- Python functions ----------
 def count_words(list sentences ):
@@ -227,6 +214,9 @@ def count_words(list sentences ):
         list byte_sentence,  results_overall, results_sentence, utf8_sentence
         # TokenC word
         Doc words
+    
+    # --- reset global variables ---
+    reset_global_variables()
     
     # --- convert python to cython ----
     start_convert = dt.now()
@@ -338,7 +328,30 @@ cdef void iterate_through_words(list byte_sentences):
         #     simple_test(10)
         #     print(psutil.virtual_memory().percent)
         del words_in_sentence
+      
+
+  
+def get_remove_words():        
+    res_list = hashmap_to_list(hashmap_words_to_remove)
+    return res_list
+    
+cdef list hashmap_to_list(PreshMap hashmap):
+    ''' converts hashmap keys to list as a byte '''
+    cdef list res_list = []
+    cdef hash_t key
+    cdef unicode word
+    cdef bytes byte_word
+    cdef Utf8Str* value
+    
+    for key in hashmap.keys():
+            value = <Utf8Str*>hashmap.get(key)
+            if value is not NULL:
+                word = get_unicode(key, hashmap)
+                byte_word = word.encode('utf-8')
+                res_list.append(byte_word)
             
+    return res_list
+        
 @cython.final
 cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
     '''
