@@ -49,13 +49,13 @@ def expand_contractions(phrase):
     # ('re) general case for appostrophe misspels
     list_general = ["you","we","they", "what"]
     list_general = "|".join(list_general)
-    phrase = re.sub(f"(?<=[{list_general}])re", " not", phrase)   
+    phrase = re.sub(f"(?<=[{list_general}])re", " are", phrase)   
     
     # ('s) general case for appostrophe misspels
     list_general = ["he","she","that", "who", "what", "where", "when", "why",
                     "how"]
     list_general = "|".join(list_general)
-    phrase = re.sub(f"(?<=[{list_general}])re", " not", phrase)  
+    phrase = re.sub(f"(?<=[{list_general}])re", " is", phrase)  
     
     # To do: add remaining
     # appostrophy misspelss (these are quite slow as each one needs to be don
