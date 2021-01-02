@@ -58,18 +58,66 @@ cdef list removed_word_sentences = []
 # =============================================================================
 # work
 # =============================================================================
-
-def call_reset_global_variables():
-    reset_global_variables()
+# # --- generate embedings ---
+# def generate_embedings(embeddings,
+#                        list sentences = removed_word_sentences, 
+#                        int max_lenth = 250):
+#     return 0
     
-def get_removed_sentences():
-    return removed_word_sentences
+# cdef
     
     
 # =============================================================================
 # Completed functions
 # =============================================================================
 # --- Python functions ----------
+
+def call_reset_global_variables(hash_all_words = False,
+                                hash_words_rem = False,
+                                count_overall = False,
+                                count_insentence = False,
+                                ls_byte_sentence = False,
+                                ls_removed_word_sentence = False
+                                ):
+
+    reset_global_variables(hash_all_words = hash_all_words,
+                                hash_words_rem = hash_words_rem,
+                                count_overall = count_overall,
+                                count_insentence = count_insentence,
+                                ls_byte_sentence = ls_byte_sentence,
+                                ls_removed_word_sentence = ls_removed_word_sentence)
+    
+
+cdef void reset_global_variables(bool hash_all_words,
+                                 bool hash_words_rem,
+                                 bool count_overall,
+                                 bool count_insentence,
+                                 bool ls_byte_sentence,
+                                 bool ls_removed_word_sentence):
+    global hashmap_all_words
+    global hashmap_words_to_remove
+    global counter_overall_word
+    global counter_word_in_sentences
+    global byte_sentences
+    global removed_word_sentences
+    
+    if hash_all_words:
+        hashmap_all_words = PreshMap(initial_size=1024)
+    if hash_words_rem:
+        hashmap_words_to_remove = PreshMap(initial_size=1024)
+    if count_overall:
+        counter_overall_word = PreshCounter(initial_size=256)
+    if count_insentence:
+        counter_word_in_sentences = PreshCounter(initial_size=256)
+    if ls_byte_sentence:
+        byte_sentences = []
+    if ls_removed_word_sentence:
+        removed_word_sentences = []
+    
+    
+def get_removed_sentences():
+    return removed_word_sentences
+
 def count_words(list sentences ):
     '''
     This function takes a list of sentences and counts the number of times
@@ -189,17 +237,20 @@ cdef void remove_words():
         bytes word
         list byte_sentence, utf8_sentence
         int length
-        hash_t key
+        str str_word
+        hash_t utf8_word
     
     for byte_sentence in byte_sentences:
         utf8_sentence = []
         for word in byte_sentence:
             length = len(word)
             utf8_word = hash_utf8(word, length)
-            value = <Utf8Str*>hashmap_words_to_remove.get(key)
-        
+            value = <Utf8Str*>hashmap_words_to_remove.get(utf8_word)
+
             if value is NULL:
-                utf8_sentence.append(word)
+                str_word = word.decode("utf-8")
+                utf8_sentence.append(str_word)
+                
                 
         removed_word_sentences.append(utf8_sentence)
     
@@ -245,7 +296,6 @@ cdef void generate_word_remove_hashmap(int min_count,
                 value = <Utf8Str*>hashmap_all_words.get(key_word_remove)
                 hashmap_words_to_remove.set(key_word_remove, value)
                 insert_value = False
-                
                 
         elif insert_value:
             freq_sentence = counter_word_in_sentences[key_word_remove]
@@ -383,22 +433,6 @@ cdef hash_t insert_in_hashmap(bytes word, PreshMap hashmap ):
         # print('unicode:2',get_unicode(key, hashmap))
         return key
 
-
-cdef void reset_global_variables():
-    global hashmap_all_words
-    global hashmap_words_to_remove
-    global counter_overall_word
-    global counter_word_in_sentences
-    global byte_sentences
-    global removed_word_sentences
-    
-    # del hashmap_all_words
-    hashmap_all_words = PreshMap(initial_size=1024)
-    hashmap_words_to_remove = PreshMap(initial_size=1024)
-    counter_overall_word = PreshCounter(initial_size=256)
-    counter_word_in_sentences = PreshCounter(initial_size=256)
-    byte_sentences = []
-    removed_word_sentences = []
             
 
 # =============================================================================

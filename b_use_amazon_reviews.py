@@ -19,9 +19,7 @@ import python_helper_functions as ph
 # =============================================================================
 # Paths
 # =============================================================================
-nlp_path = Path("/home/ivan/git/natural-language-processing/")
-week3_path = nlp_path / "week3"
-data_path = nlp_path / "week3/data"
+data_path = Path("/home/ivan/Downloads/All_Amazon_Review.json.gz")
 
 # =============================================================================
 # import data
@@ -39,23 +37,40 @@ data_path = nlp_path / "week3/data"
 # ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
 # Adding the lower() step here makes nlp() step faster
 
+
+
+import json
+import gzip
+
 def read_corpus(filename, rows=100000):
     data = []
+    scores = []
     counter = 0
-    for line in open(filename, encoding="utf-8"):
-        line = line.strip().split("\t")[0].lower()
-        line = ph.expand_contractions(line)
-        data.append(line)
-        counter += 1
-        if counter >= rows:
+    
+    for line in gzip.open(filename, 'rb'):
+        one_line = json.loads(line)
+        try:
+            text = one_line['reviewText']
+            score = one_line['overall']
+            
+            text = text.strip().lower()
+            text = ph.expand_contractions(text)
+            
+            data.append(text)
+            scores.append(score)
+            counter+=1
+        except KeyError:
+            pass
+        
+        if counter>=rows:
             break
-    # print(counter)
-    return data
+    return data, scores
+
 
 
 # import data
 start_read = dt.now()
-sentences = read_corpus(data_path / "train.tsv")
+sentences, scores = read_corpus(filename = data_path )
 end_read = dt.now()
 
 
@@ -204,20 +219,3 @@ print("removed_words time:", end_removed_words - start_removed_words)
 # make_embedings = [[word.decode('utf8') for word in sentence] for sentence in final_words]
 
 # w2v_model.build_vocab(final_words, progress_per=10000)
-
-path = "/home/ivan/Downloads/All_Amazon_Review.json.gz"
-
-import json
-import gzip
-
-
-
-counter = 0
-for line in gzip.open(path, 'rb'):
-
-    one_line = json.loads(line)
-    print(one_line)
-    counter+=1
-    print(counter)
-    if counter>=3:
-        break

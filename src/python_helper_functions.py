@@ -48,23 +48,24 @@ def expand_contractions(phrase):
     phrase = re.sub(r"\'ve", " have", phrase)
     phrase = re.sub(r"\'m", " am", phrase)
     
-    # ('nt) general case for appostrophe misspels
-    list_general = ["are","can","dare","did","do","does", "has", "have",
-                    "had", "is", "may", "might", "must","ought", "should",
-                    "was", "were",  "would"]
-    list_general = "|".join(list_general)
-    phrase = re.sub(f"(?<=[{list_general}])nt", " not", phrase)
+    # --- Gotta work on these, as they are a bit funky ---
+    # # ('nt) general case for appostrophe misspels
+    # list_general = ["are","can","dare","did","do","does", "has", "have",
+    #                 "had", "is", "may", "might", "must","ought", "should",
+    #                 "was", "were",  "would"]
+    # list_general = "|".join(list_general)
+    # phrase = re.sub(f"(?<=[{list_general}])nt", " not", phrase)
     
-    # ('re) general case for appostrophe misspels
-    list_general = ["you","they"]#, "what"] # --- for some reason that what causes issues
-    list_general = "|".join(list_general)
-    phrase = re.sub(f"(?<=[{list_general}])re", " are", phrase)   
+    # # ('re) general case for appostrophe misspels
+    # list_general = ["you","they"]#, "what"] # --- for some reason that what causes issues
+    # list_general = "|".join(list_general)
+    # phrase = re.sub(f"(?<=[{list_general}])re", " are", phrase)   
     
-    # ('s) general case for appostrophe misspels
-    list_general = ["he","she","that", "who", "what", "where", "when", "why",
-                    "how"]
-    list_general = "|".join(list_general)
-    phrase = re.sub(f"(?<=[{list_general}])s", " is", phrase)  
+    # # ('s) general case for appostrophe misspels
+    # list_general = ["he","she","that", "who", "what", "where", "when", "why",
+    #                 "how"]
+    # list_general = "|".join(list_general)
+    # phrase = re.sub(f"(?<=[{list_general}])s", " is", phrase)  
     
     # To do: add remaining
     # appostrophy misspelss (these are quite slow as each one needs to be don

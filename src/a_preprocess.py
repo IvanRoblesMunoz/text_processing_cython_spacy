@@ -15,13 +15,12 @@ import pandas as pd
 import re
 
 import python_helper_functions as ph
+import cython_preprocessing as st
 
 # =============================================================================
 # Paths
 # =============================================================================
-nlp_path = Path("/home/ivan/git/natural-language-processing/")
-week3_path = nlp_path / "week3"
-data_path = nlp_path / "week3/data"
+data_path = Path("/home/ivan/Downloads/All_Amazon_Review.json.gz")
 
 # =============================================================================
 # import data
@@ -36,26 +35,42 @@ data_path = nlp_path / "week3/data"
 # https://dev.to/vi3k6i5/regex-was-taking-5-days-to-run-so-i-built-a-tool-that-did-it-in-15-minutes-c98
 
 # Test expand_contractions function
-# ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
+ph.expand_contractions("I can't wait to go! isn't aren't couldn't doesn't doesnt cannot")
 # Adding the lower() step here makes nlp() step faster
 
-def read_corpus(filename, rows=100000):
+import json
+import gzip
+
+def read_corpus(filename, rows=30000):
     data = []
+    scores = []
     counter = 0
-    for line in open(filename, encoding="utf-8"):
-        line = line.strip().split("\t")[0].lower()
-        line = ph.expand_contractions(line)
-        data.append(line)
-        counter += 1
-        if counter >= rows:
+    
+    for line in gzip.open(filename, 'rb'):
+        one_line = json.loads(line)
+        try:
+            text = one_line['reviewText']
+            score = one_line['overall']
+
+            text = text.strip().lower()
+            text = ph.expand_contractions(text)
+
+            data.append(text)
+            scores.append(score)
+            counter+=1
+        except KeyError:
+            pass
+        
+        if counter>=rows:
             break
-    # print(counter)
-    return data
+    print(counter)
+    return data, scores
+
 
 
 # import data
 start_read = dt.now()
-sentences = read_corpus(data_path / "train.tsv")
+sentences, scores = read_corpus(filename = data_path )
 end_read = dt.now()
 
 
@@ -97,6 +112,10 @@ regex_list = [
     # comas that arent surrounded by numbers
     ",(?![0-9])(?<![0-9])",
     "(?<=^),",
+    "\.",
+    "$",
+    ";",
+    "&"
 ]
 
 regex_infix, regex_prefix = ph.combine_re(regex_list)
@@ -129,7 +148,6 @@ nlp.tokenizer = Tokenizer(
 # generate spacy docs and run cython preprocessing steps
 # =============================================================================
 
-import spacy_tokenize as st
 st.call_reset_global_variables()
 
 start_nlp = dt.now()
@@ -149,12 +167,16 @@ from nltk.corpus import stopwords
 stopwords = stopwords.words('english')
 stopwords = [i for i in stopwords if "'" not in i]
 
+import string  
+punctuation  = [i for i in string.punctuation if i not in ["!", '$']]
+
+
 start_generate_remove_hash = dt.now()
 # x2 faster than using python although this is a very fast step anyways
 st.call_word_remove_hashmap(
-    min_count=50,
+    min_count=20,
     max_doc=int(len(sentences)*0.70),
-    other_words=stopwords,
+    other_words=stopwords + punctuation,
 )
 end_generate_remove_hash = dt.now()
 
@@ -163,7 +185,7 @@ rem_words = st.call_remove_words()
 end_removed_words = dt.now()
 
 
-rem_words_hash = st.get_remove_words()
+rem_words_hash = st.get_remove_words_hashmap()
 rem_words_hash = [i.decode("utf-8") for i in rem_words_hash]
 rem_words_hash = pd.DataFrame(data = rem_words_hash,
                               columns = ['remove_words'])
@@ -186,38 +208,119 @@ print("removed_words time:", end_removed_words - start_removed_words)
 # generate word embedings
 # =============================================================================
 
-# import multiprocessing
-# from gensim.models import Word2Vec
+nlp_path = Path("/home/ivan/git/natural-language-processing/")
+data_path = nlp_path / "week3/data"
+week3_path = nlp_path / "week3"
+
+# --- read word embedings ---
+if not ('wv_embeddings' in locals() or 'wv_embeddings' in globals()):
+    import gensim.models.keyedvectors as word2vec
+    wv_embeddings= word2vec.KeyedVectors.load_word2vec_format(
+        str(week3_path / "GoogleNews-vectors-negative300.bin.gz"), binary=True
+    )
+
+length = []
+for i in final_words:
+    length.append(len(i))
+length = pd.DataFrame(length)
 
 
-# cores = multiprocessing.cpu_count()
-# w2v_model = Word2Vec(min_count = 0,
-#                      window=2,
-#                      size=300,
-#                      sample=6e-5, 
-#                      alpha=0.03, 
-#                      min_alpha=0.0007, 
-#                      negative=20,
-#                      workers=cores-1)
+# =============================================================================
+# Define data input to the model
+# =============================================================================
+
+# --- Start numpy array ----
+import numpy as np
+n_obs = len(final_words)
+N_WORDS = 250
+EMBEDDING_DIMENSIONS = 300
+KERNEL_SIZE = 4
+
+numpy_data = np.zeros([n_obs,
+                       N_WORDS,
+                       EMBEDDING_DIMENSIONS])
+
+numpy_data.shape
+
+sentence_counter = 0
+for sentence in final_words:
+    
+    # --- define starting point ----
+    sentence_length = len(sentence)
+    if sentence_length <= N_WORDS-KERNEL_SIZE:
+        word_counter = KERNEL_SIZE
+    else:
+        word_counter = max(0,N_WORDS - sentence_length)
+        
+    for word in sentence:
+
+        try:
+            word_vector = wv_embeddings[word]
+            numpy_data[
+                sentence_counter,
+                word_counter,
+                :
+                    ] = word_vector
+            
+            word_counter += 1
+            
+        except KeyError:
+            pass
+        
+        except IndexError:
+            break
+            
+    sentence_counter += 1
+    
 
 
-# make_embedings = [[word.decode('utf8') for word in sentence] for sentence in final_words]
+# =============================================================================
+# Generate model
+# =============================================================================
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers, models
+from tensorflow.keras.layers import Conv1D, GlobalMaxPooling1D, Dropout, Dense, Activation
 
-# w2v_model.build_vocab(final_words, progress_per=10000)
+model = models.Sequential()
 
-path = "/home/ivan/Downloads/All_Amazon_Review.json.gz"
+model.add(Conv1D(filters= 250,
+                 kernel_size = 3,
+                 # padding = 'valid' , 
+                 activation = 'relu',
+                 strides = 1 , 
+                 input_shape = (250,300)))
 
-import json
-import gzip
+model.add(GlobalMaxPooling1D())
+
+model.add(Dense(15))
+model.add(Dropout(0.2))
+model.add(Activation('relu'))
+model.add(Dense(1))
+model.add(Activation('linear'))
+
+model.summary()
 
 
+model.compile(loss = 'MeanSquaredError',
+              optimizer = 'adam', 
+              metrics = ['MeanSquaredError',
+                         'MeanAbsoluteError']
+              )
 
-counter = 0
-for line in gzip.open(path, 'rb'):
+numpy_target = np.array(scores)
 
-    one_line = json.loads(line)
-    print(one_line)
-    counter+=1
-    print(counter)
-    if counter>=3:
-        break
+train_test_split = 25000
+x_train = numpy_data[:train_test_split][:]
+y_train = numpy_target[:train_test_split]
+
+
+x_test = numpy_data[train_test_split:]
+y_test = numpy_target[train_test_split:]
+
+model.fit(numpy_data,
+          numpy_target,
+          batch_size = 100,
+          epochs = 100 , 
+          validation_data = (x_test,y_test)
+          )
